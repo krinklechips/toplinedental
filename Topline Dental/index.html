@@ -30,6 +30,15 @@
       content="Modern dental equipment, sterilization systems, and imaging solutions for clinics across Malaysia."
     />
     <meta name="twitter:image" content="/topline-logo.png" />
+    <script>
+      (function () {
+        var params = new URLSearchParams(window.location.search);
+        var redirect = params.get("redirect");
+        if (redirect) {
+          history.replaceState(null, "", redirect);
+        }
+      })();
+    </script>
     <link rel="icon" href="/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
