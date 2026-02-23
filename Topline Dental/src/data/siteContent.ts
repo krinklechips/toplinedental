@@ -75,6 +75,51 @@ export const productHighlights = [
   }
 ];
 
+export const materialLineup = [
+  {
+    title: "Restorative Materials",
+    tag: "Composites • Adhesives • Cements",
+    description:
+      "Composite restoratives, bonding agents, etchants, liners, and luting / resin cements for direct and indirect restorative workflows.",
+    examples: ["Universal composites", "Bonding systems", "Resin / glass ionomer cements"]
+  },
+  {
+    title: "Impression & Prosthetic Materials",
+    tag: "Alginate • VPS • Bite Registration",
+    description:
+      "Impression materials and accessories for study models, prosthetic work, and precision restorative cases.",
+    examples: ["Alginate", "Vinyl polysiloxane (VPS)", "Bite registration materials"]
+  },
+  {
+    title: "Endodontic Consumables",
+    tag: "Obturation • Irrigation • Sealers",
+    description:
+      "Core root canal consumables and supporting materials for shaping, irrigation, obturation, and sealing protocols.",
+    examples: ["Gutta-percha / obturation materials", "Endo sealers", "Irrigation materials"]
+  },
+  {
+    title: "Preventive & Hygiene Materials",
+    tag: "Prophy • Fluoride • Infection Control",
+    description:
+      "Day-to-day preventive and hygiene materials that support infection control, patient safety, and chairside turnover.",
+    examples: ["Prophy and preventive products", "Surface barriers / disposables", "Sterilization consumables"]
+  },
+  {
+    title: "Finishing, Polishing & Chairside Accessories",
+    tag: "Workflow Consumables",
+    description:
+      "Chairside materials and accessories used to complete restorative procedures efficiently and consistently.",
+    examples: ["Finishing and polishing consumables", "Mixing and dispensing accessories", "Matrices and wedges"]
+  },
+  {
+    title: "Lab & Digital Workflow Materials",
+    tag: "CAD/CAM • 3D Print • Model Materials",
+    description:
+      "Selected laboratory and digital workflow materials for model work, chairside fabrication support, and modern clinic-lab coordination.",
+    examples: ["CAD/CAM material categories", "3D printing resins", "Model / gypsum materials"]
+  }
+] as const;
+
 export const dashboardSignals = [
   {
     label: "Recommended Mix",
@@ -93,6 +138,7 @@ export const dashboardSignals = [
 export const enquiryOptions = [
   "General Inquiry",
   "Equipment Quote",
+  "Dental Materials & Consumables",
   "Dental Chairs & Units",
   "Digital Imaging Systems",
   "Sterilization & Hygiene",
@@ -135,5 +181,6 @@ export const equipmentFocusOptions = [
   "Digital X-ray / imaging",
   "Sterilization systems",
   "Water filtration",
+  "Dental materials & consumables",
   "Accessories & consumables"
 ];

@@ -7,10 +7,15 @@ import StudioToolbar from "../components/layout-studio/StudioToolbar";
 import {
   GRID_SIZE,
   LAYOUT_ITEM_BY_TYPE,
+  LAYOUT_ZONE_BY_TYPE,
+  LAYOUT_ZONE_DEFINITIONS,
   SCALE_LABEL,
   type LayoutItem,
   type LayoutItemType,
-  isLayoutItemType
+  type LayoutZone,
+  type LayoutZoneType,
+  isLayoutItemType,
+  isLayoutZoneType
 } from "../components/layout-studio/types";
 
 type StageSize = {
@@ -26,9 +31,14 @@ type RoomRect = {
 };
 
 const STORAGE_KEY = "topline-layout-studio-v1";
+const MIN_ZONE_SIZE = GRID_SIZE * 4;
 
 const snapToGrid = (value: number) => Math.round(value / GRID_SIZE) * GRID_SIZE;
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+const overlaps = (
+  a: { left: number; right: number; top: number; bottom: number },
+  b: { left: number; right: number; top: number; bottom: number }
+) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
 
 const createItemId = () =>
   typeof crypto !== "undefined" && "randomUUID" in crypto
@@ -49,34 +59,65 @@ const getRoomRect = ({ width, height }: StageSize): RoomRect => {
   };
 };
 
-const restoreItems = (): LayoutItem[] => {
+type LayoutStudioState = {
+  items: LayoutItem[];
+  zones: LayoutZone[];
+};
+
+const restoreLayoutState = (): LayoutStudioState => {
   if (typeof window === "undefined") {
-    return [];
+    return { items: [], zones: [] };
   }
 
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) {
-      return [];
+      return { items: [], zones: [] };
     }
 
     const parsed = JSON.parse(raw) as unknown;
-    if (!Array.isArray(parsed)) {
-      return [];
+
+    const isValidItem = (entry: unknown): entry is LayoutItem =>
+      typeof entry === "object" &&
+      entry !== null &&
+      typeof (entry as LayoutItem).id === "string" &&
+      isLayoutItemType((entry as LayoutItem).type) &&
+      typeof (entry as LayoutItem).x === "number" &&
+      typeof (entry as LayoutItem).y === "number" &&
+      typeof (entry as LayoutItem).rotation === "number" &&
+      ((entry as LayoutItem).width === undefined || typeof (entry as LayoutItem).width === "number") &&
+      ((entry as LayoutItem).height === undefined || typeof (entry as LayoutItem).height === "number");
+
+    const isValidZone = (entry: unknown): entry is LayoutZone =>
+      typeof entry === "object" &&
+      entry !== null &&
+      typeof (entry as LayoutZone).id === "string" &&
+      isLayoutZoneType((entry as LayoutZone).type) &&
+      typeof (entry as LayoutZone).label === "string" &&
+      typeof (entry as LayoutZone).x === "number" &&
+      typeof (entry as LayoutZone).y === "number" &&
+      typeof (entry as LayoutZone).width === "number" &&
+      typeof (entry as LayoutZone).height === "number" &&
+      typeof (entry as LayoutZone).color === "string";
+
+    if (Array.isArray(parsed)) {
+      return {
+        items: parsed.filter(isValidItem),
+        zones: []
+      };
     }
 
-    return parsed.filter(
-      (entry): entry is LayoutItem =>
-        typeof entry === "object" &&
-        entry !== null &&
-        typeof (entry as LayoutItem).id === "string" &&
-        isLayoutItemType((entry as LayoutItem).type) &&
-        typeof (entry as LayoutItem).x === "number" &&
-        typeof (entry as LayoutItem).y === "number" &&
-        typeof (entry as LayoutItem).rotation === "number"
-    );
+    if (typeof parsed === "object" && parsed !== null) {
+      const candidate = parsed as { items?: unknown; zones?: unknown };
+      return {
+        items: Array.isArray(candidate.items) ? candidate.items.filter(isValidItem) : [],
+        zones: Array.isArray(candidate.zones) ? candidate.zones.filter(isValidZone) : []
+      };
+    }
+
+    return { items: [], zones: [] };
   } catch {
-    return [];
+    return { items: [], zones: [] };
   }
 };
 
@@ -183,50 +224,237 @@ function CanvasGlyph({ type }: { type: LayoutItemType }) {
 export default function LayoutStudio() {
   const stageRef = useRef<Konva.Stage | null>(null);
   const canvasWrapRef = useRef<HTMLDivElement | null>(null);
+  const initialStateRef = useRef<LayoutStudioState | null>(null);
 
-  const [items, setItems] = useState<LayoutItem[]>(() => restoreItems());
+  if (!initialStateRef.current) {
+    initialStateRef.current = restoreLayoutState();
+  }
+
+  const [items, setItems] = useState<LayoutItem[]>(() => initialStateRef.current?.items ?? []);
+  const [zones, setZones] = useState<LayoutZone[]>(() => initialStateRef.current?.zones ?? []);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedZoneId, setSelectedZoneId] = useState<string | null>(null);
   const [armedType, setArmedType] = useState<LayoutItemType | null>(null);
   const [draggingId, setDraggingId] = useState<string | null>(null);
+  const [draggingZoneId, setDraggingZoneId] = useState<string | null>(null);
   const [stageSize, setStageSize] = useState<StageSize>({ width: 1040, height: 680 });
+  const [zoom, setZoom] = useState(1);
 
   const roomRect = useMemo(() => getRoomRect(stageSize), [stageSize]);
+  const contentOffset = useMemo(
+    () => ({
+      x: (stageSize.width - stageSize.width * zoom) / 2,
+      y: (stageSize.height - stageSize.height * zoom) / 2
+    }),
+    [stageSize, zoom]
+  );
+  const toCanvasPoint = useCallback(
+    (point: { x: number; y: number }) => ({
+      x: (point.x - contentOffset.x) / zoom,
+      y: (point.y - contentOffset.y) / zoom
+    }),
+    [contentOffset.x, contentOffset.y, zoom]
+  );
 
-  const fitToRoom = useCallback(
-    (itemType: LayoutItemType, x: number, y: number) => {
-      const definition = LAYOUT_ITEM_BY_TYPE[itemType];
-      const halfWidth = definition.footprint.width / 2;
-      const halfHeight = definition.footprint.height / 2;
+  const getItemDimensions = useCallback((item: Pick<LayoutItem, "type" | "width" | "height">) => {
+    const definition = LAYOUT_ITEM_BY_TYPE[item.type];
+    return {
+      width: item.width ?? definition.footprint.width,
+      height: item.height ?? definition.footprint.height
+    };
+  }, []);
+
+  const getItemBounds = useCallback(
+    (item: Pick<LayoutItem, "type" | "x" | "y" | "rotation" | "width" | "height">) => {
+      const { width, height } = getItemDimensions(item);
+      const rotated = Math.abs(item.rotation % 180) === 90;
+      const visualWidth = rotated ? height : width;
+      const visualHeight = rotated ? width : height;
+
+      return {
+        left: item.x - visualWidth / 2,
+        right: item.x + visualWidth / 2,
+        top: item.y - visualHeight / 2,
+        bottom: item.y + visualHeight / 2
+      };
+    },
+    [getItemDimensions]
+  );
+
+  const fitItemToRoom = useCallback(
+    (item: Pick<LayoutItem, "type" | "rotation" | "width" | "height">, x: number, y: number) => {
+      const { width, height } = getItemDimensions(item);
+      const rotated = Math.abs(item.rotation % 180) === 90;
+      const visualWidth = rotated ? height : width;
+      const visualHeight = rotated ? width : height;
+      const halfWidth = visualWidth / 2;
+      const halfHeight = visualHeight / 2;
 
       return {
         x: clamp(snapToGrid(x), roomRect.x + halfWidth, roomRect.x + roomRect.width - halfWidth),
         y: clamp(snapToGrid(y), roomRect.y + halfHeight, roomRect.y + roomRect.height - halfHeight)
       };
     },
+    [getItemDimensions, roomRect]
+  );
+
+  const canPlaceItem = useCallback(
+    (
+      candidate: Pick<LayoutItem, "id" | "type" | "x" | "y" | "rotation" | "width" | "height">,
+      excludeId?: string
+    ) => {
+      const candidateBounds = getItemBounds(candidate);
+      return !items.some((entry) => {
+        if (entry.id === (excludeId ?? candidate.id)) {
+          return false;
+        }
+        return overlaps(candidateBounds, getItemBounds(entry));
+      });
+    },
+    [getItemBounds, items]
+  );
+
+  const fitItemResize = useCallback(
+    (
+      item: Pick<LayoutItem, "id" | "type" | "x" | "y" | "rotation" | "width" | "height">,
+      proposedWidth: number,
+      proposedHeight: number
+    ) => {
+      const definition = LAYOUT_ITEM_BY_TYPE[item.type];
+      const defaultSize = getItemDimensions(item);
+      const minSize = definition.minSize ?? {
+        width: Math.max(80, Math.round(defaultSize.width * 0.7)),
+        height: Math.max(60, Math.round(defaultSize.height * 0.7))
+      };
+      const maxSize = definition.maxSize ?? {
+        width: Math.round(defaultSize.width * 1.8),
+        height: Math.round(defaultSize.height * 1.8)
+      };
+
+      const width = clamp(snapToGrid(proposedWidth), minSize.width, maxSize.width);
+      const height = clamp(snapToGrid(proposedHeight), minSize.height, maxSize.height);
+      const nextPosition = fitItemToRoom({ ...item, width, height }, item.x, item.y);
+
+      return { width, height, x: nextPosition.x, y: nextPosition.y };
+    },
+    [fitItemToRoom, getItemDimensions]
+  );
+
+  const findFreeItemPosition = useCallback(
+    (candidate: Pick<LayoutItem, "id" | "type" | "rotation" | "width" | "height">, x: number, y: number) => {
+      const first = fitItemToRoom(candidate, x, y);
+      const firstCandidate = { ...candidate, ...first };
+      if (canPlaceItem(firstCandidate, candidate.id)) {
+        return first;
+      }
+
+      const maxRadius = 24;
+      for (let ring = 1; ring <= maxRadius; ring += 1) {
+        for (let dx = -ring; dx <= ring; dx += 1) {
+          for (let dy = -ring; dy <= ring; dy += 1) {
+            if (Math.abs(dx) !== ring && Math.abs(dy) !== ring) {
+              continue;
+            }
+
+            const next = fitItemToRoom(candidate, x + dx * GRID_SIZE, y + dy * GRID_SIZE);
+            const nextCandidate = { ...candidate, ...next };
+            if (canPlaceItem(nextCandidate, candidate.id)) {
+              return next;
+            }
+          }
+        }
+      }
+
+      return null;
+    },
+    [canPlaceItem, fitItemToRoom]
+  );
+
+  const fitZoneRect = useCallback(
+    (zone: Pick<LayoutZone, "x" | "y" | "width" | "height">) => {
+      const maxWidth = roomRect.x + roomRect.width - zone.x;
+      const maxHeight = roomRect.y + roomRect.height - zone.y;
+      const width = clamp(snapToGrid(zone.width), MIN_ZONE_SIZE, Math.max(MIN_ZONE_SIZE, maxWidth));
+      const height = clamp(
+        snapToGrid(zone.height),
+        MIN_ZONE_SIZE,
+        Math.max(MIN_ZONE_SIZE, maxHeight)
+      );
+
+      const x = clamp(snapToGrid(zone.x), roomRect.x, roomRect.x + roomRect.width - width);
+      const y = clamp(snapToGrid(zone.y), roomRect.y, roomRect.y + roomRect.height - height);
+
+      return { x, y, width, height };
+    },
     [roomRect]
   );
 
   const addItem = useCallback(
     (type: LayoutItemType, x: number, y: number) => {
-      const nextPosition = fitToRoom(type, x, y);
-      const nextItem: LayoutItem = {
+      const definition = LAYOUT_ITEM_BY_TYPE[type];
+      const seed: LayoutItem = {
         id: createItemId(),
         type,
+        x,
+        y,
+        rotation: 0,
+        width: definition.footprint.width,
+        height: definition.footprint.height
+      };
+      const nextPosition = findFreeItemPosition(seed, x, y);
+      if (!nextPosition) {
+        return;
+      }
+
+      const nextItem: LayoutItem = {
+        ...seed,
         x: nextPosition.x,
-        y: nextPosition.y,
-        rotation: 0
+        y: nextPosition.y
       };
 
       setItems((previous) => [...previous, nextItem]);
       setSelectedId(nextItem.id);
+      setSelectedZoneId(null);
       setArmedType(null);
     },
-    [fitToRoom]
+    [findFreeItemPosition]
+  );
+
+  const addZone = useCallback(
+    (type: LayoutZoneType) => {
+      const definition = LAYOUT_ZONE_BY_TYPE[type];
+      const existingCount = zones.filter((zone) => zone.type === type).length;
+      const seeded = fitZoneRect({
+        x: roomRect.x + GRID_SIZE * (2 + (existingCount % 4)),
+        y: roomRect.y + GRID_SIZE * (2 + (existingCount % 3)),
+        width: definition.defaultSize.width,
+        height: definition.defaultSize.height
+      });
+
+      const nextZone: LayoutZone = {
+        id: createItemId(),
+        type,
+        label: existingCount > 0 ? `${definition.label} ${existingCount + 1}` : definition.label,
+        color: definition.color,
+        ...seeded
+      };
+
+      setZones((previous) => [...previous, nextZone]);
+      setSelectedZoneId(nextZone.id);
+      setSelectedId(null);
+      setArmedType(null);
+    },
+    [fitZoneRect, roomRect, zones]
   );
 
   const removeItem = useCallback((id: string) => {
     setItems((previous) => previous.filter((item) => item.id !== id));
     setSelectedId((previous) => (previous === id ? null : previous));
+  }, []);
+
+  const removeZone = useCallback((id: string) => {
+    setZones((previous) => previous.filter((zone) => zone.id !== id));
+    setSelectedZoneId((previous) => (previous === id ? null : previous));
   }, []);
 
   const rotateItem = useCallback((id: string) => {
@@ -250,7 +478,14 @@ export default function LayoutStudio() {
       }
 
       const duplicatedId = createItemId();
-      const nextPosition = fitToRoom(sourceItem.type, sourceItem.x + GRID_SIZE, sourceItem.y + GRID_SIZE);
+      const nextPosition = findFreeItemPosition(
+        { ...sourceItem, id: duplicatedId },
+        sourceItem.x + GRID_SIZE,
+        sourceItem.y + GRID_SIZE
+      );
+      if (!nextPosition) {
+        return;
+      }
 
       setItems((previous) => [
         ...previous,
@@ -262,8 +497,39 @@ export default function LayoutStudio() {
         }
       ]);
       setSelectedId(duplicatedId);
+      setSelectedZoneId(null);
     },
-    [fitToRoom, items]
+    [findFreeItemPosition, items]
+  );
+
+  const duplicateZone = useCallback(
+    (id: string) => {
+      const sourceZone = zones.find((zone) => zone.id === id);
+      if (!sourceZone) {
+        return;
+      }
+
+      const nextId = createItemId();
+      const nextRect = fitZoneRect({
+        x: sourceZone.x + GRID_SIZE,
+        y: sourceZone.y + GRID_SIZE,
+        width: sourceZone.width,
+        height: sourceZone.height
+      });
+
+      setZones((previous) => [
+        ...previous,
+        {
+          ...sourceZone,
+          ...nextRect,
+          id: nextId,
+          label: `${sourceZone.label} Copy`
+        }
+      ]);
+      setSelectedZoneId(nextId);
+      setSelectedId(null);
+    },
+    [fitZoneRect, zones]
   );
 
   const onCanvasDrop = (event: DragEvent<HTMLDivElement>) => {
@@ -275,7 +541,11 @@ export default function LayoutStudio() {
     }
 
     const bounds = event.currentTarget.getBoundingClientRect();
-    addItem(rawType, event.clientX - bounds.left, event.clientY - bounds.top);
+    const point = toCanvasPoint({
+      x: event.clientX - bounds.left,
+      y: event.clientY - bounds.top
+    });
+    addItem(rawType, point.x, point.y);
   };
 
   const onStagePointerDown = (
@@ -294,18 +564,36 @@ export default function LayoutStudio() {
     const isCanvasSurface = event.target === stage || event.target.hasName("room-surface");
 
     if (armedType && isCanvasSurface) {
-      addItem(armedType, pointer.x, pointer.y);
+      const canvasPointer = toCanvasPoint(pointer);
+      addItem(armedType, canvasPointer.x, canvasPointer.y);
       return;
     }
 
     if (isCanvasSurface) {
       setSelectedId(null);
+      setSelectedZoneId(null);
       setArmedType(null);
     }
   };
 
+  const buildExportPayload = () => ({
+    exportedAt: new Date().toISOString(),
+    scale: SCALE_LABEL,
+    roomBoundary: roomRect,
+    zones: zones.map(({ id, type, label, x, y, width, height }) => ({
+      id,
+      type,
+      label,
+      x,
+      y,
+      width,
+      height
+    })),
+    items
+  });
+
   const exportJson = () => {
-    const payload = JSON.stringify(items, null, 2);
+    const payload = JSON.stringify(buildExportPayload(), null, 2);
     const blob = new Blob([payload], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
@@ -328,16 +616,53 @@ export default function LayoutStudio() {
     anchor.click();
   };
 
+  const emailSales = () => {
+    exportPng();
+    exportJson();
+
+    const zoneSummary = zones.map((zone) => `- ${zone.label} (${zone.width}x${zone.height})`).join("\n");
+    const itemSummary = items
+      .map((item) => `- ${LAYOUT_ITEM_BY_TYPE[item.type].label} @ (${item.x}, ${item.y})`)
+      .slice(0, 12)
+      .join("\n");
+
+    const bodyLines = [
+      "Hi Carey,",
+      "",
+      "Please find my clinic layout draft attached (PNG + JSON were downloaded from Layout Studio).",
+      "",
+      `Zones: ${zones.length}`,
+      `Equipment items: ${items.length}`,
+      "",
+      zones.length ? "Room zoning:" : "Room zoning: (not defined yet)",
+      zoneSummary || "-",
+      "",
+      items.length ? "Equipment placed (sample):" : "Equipment placed: (none yet)",
+      itemSummary || "-",
+      "",
+      "Notes:",
+      ""
+    ];
+
+    const mailto = `mailto:carey@toplinedc.com?subject=${encodeURIComponent(
+      "Clinic Layout Draft Submission"
+    )}&body=${encodeURIComponent(bodyLines.join("\n"))}`;
+
+    window.location.href = mailto;
+  };
+
   const resetLayout = () => {
     setItems([]);
+    setZones([]);
     setSelectedId(null);
+    setSelectedZoneId(null);
     setArmedType(null);
     window.localStorage.removeItem(STORAGE_KEY);
   };
 
   useEffect(() => {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-  }, [items]);
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ items, zones }));
+  }, [items, zones]);
 
   useEffect(() => {
     const wrapper = canvasWrapRef.current;
@@ -362,7 +687,10 @@ export default function LayoutStudio() {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (!selectedId) {
+      const activeItemId = selectedId;
+      const activeZoneId = selectedZoneId;
+
+      if (!activeItemId && !activeZoneId) {
         return;
       }
 
@@ -373,25 +701,33 @@ export default function LayoutStudio() {
 
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "d") {
         event.preventDefault();
-        duplicateItem(selectedId);
+        if (activeItemId) {
+          duplicateItem(activeItemId);
+        } else if (activeZoneId) {
+          duplicateZone(activeZoneId);
+        }
         return;
       }
 
-      if (event.key.toLowerCase() === "r") {
+      if (event.key.toLowerCase() === "r" && activeItemId) {
         event.preventDefault();
-        rotateItem(selectedId);
+        rotateItem(activeItemId);
         return;
       }
 
       if (event.key === "Delete" || event.key === "Backspace") {
         event.preventDefault();
-        removeItem(selectedId);
+        if (activeItemId) {
+          removeItem(activeItemId);
+        } else if (activeZoneId) {
+          removeZone(activeZoneId);
+        }
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [duplicateItem, removeItem, rotateItem, selectedId]);
+  }, [duplicateItem, duplicateZone, removeItem, removeZone, rotateItem, selectedId, selectedZoneId]);
 
   const gridLines = useMemo(() => {
     const lines: Array<{ points: number[]; key: string }> = [];
@@ -413,21 +749,69 @@ export default function LayoutStudio() {
     return lines;
   }, [roomRect]);
 
+  const selectionLabel = useMemo(() => {
+    if (selectedId) {
+      return "Item selected";
+    }
+    if (selectedZoneId) {
+      return "Zone selected";
+    }
+    return "No selection";
+  }, [selectedId, selectedZoneId]);
+
   return (
     <section className="section layout-studio-section">
       <div className="layout-studio-shell">
         <StudioToolbar
-          hasSelection={Boolean(selectedId)}
+          selectionLabel={selectionLabel}
           onReset={resetLayout}
           onExportPng={exportPng}
           onExportJson={exportJson}
+          onEmailSales={emailSales}
         />
 
         <div className="layout-studio-workspace">
-          <Palette
-            armedType={armedType}
-            onArmTool={(type) => setArmedType((previous) => (previous === type ? null : type))}
-          />
+          <div className="layout-sidebar-stack">
+            <Palette
+              armedType={armedType}
+              onArmTool={(type) => setArmedType((previous) => (previous === type ? null : type))}
+            />
+
+            <aside className="layout-zone-panel" aria-label="Room zoning tools">
+              <div>
+                <p className="layout-panel-title">Room Zoning</p>
+                <p className="layout-panel-note">
+                  Add room blocks first, then drag and resize them inside the clinic boundary.
+                </p>
+              </div>
+
+              <div className="layout-zone-grid">
+                {LAYOUT_ZONE_DEFINITIONS.map((zone) => (
+                  <button
+                    key={zone.type}
+                    type="button"
+                    className="layout-zone-preset"
+                    onClick={() => addZone(zone.type)}
+                  >
+                    <span
+                      className="layout-zone-swatch"
+                      style={{ backgroundColor: `${zone.color}1f`, borderColor: `${zone.color}55` }}
+                      aria-hidden="true"
+                    />
+                    <span>{zone.label}</span>
+                  </button>
+                ))}
+              </div>
+
+              <div className="layout-zone-panel-foot">
+                <p className="layout-panel-note">
+                  Selected zone: drag to move, drag the corner handle to resize, <kbd>Delete</kbd> to
+                  remove.
+                </p>
+                <p className="layout-panel-note">Total zones: {zones.length}</p>
+              </div>
+            </aside>
+          </div>
 
           <div
             className="layout-stage-shell"
@@ -435,6 +819,33 @@ export default function LayoutStudio() {
             onDrop={onCanvasDrop}
             onDragOver={(event) => event.preventDefault()}
           >
+            <div className="layout-stage-controls" aria-label="Canvas zoom controls">
+              <button
+                type="button"
+                className="layout-stage-control"
+                onClick={() => setZoom((previous) => clamp(Number((previous - 0.1).toFixed(2)), 0.5, 1.4))}
+                aria-label="Zoom out"
+              >
+                -
+              </button>
+              <span className="layout-stage-zoom-label">{Math.round(zoom * 100)}%</span>
+              <button
+                type="button"
+                className="layout-stage-control"
+                onClick={() => setZoom((previous) => clamp(Number((previous + 0.1).toFixed(2)), 0.5, 1.4))}
+                aria-label="Zoom in"
+              >
+                +
+              </button>
+              <button
+                type="button"
+                className="layout-stage-control layout-stage-control--fit"
+                onClick={() => setZoom(1)}
+              >
+                Fit
+              </button>
+            </div>
+
             <Stage
               width={stageSize.width}
               height={stageSize.height}
@@ -444,6 +855,7 @@ export default function LayoutStudio() {
             >
               <Layer>
                 <Rect x={0} y={0} width={stageSize.width} height={stageSize.height} fill="#f9fbff" />
+                <Group x={contentOffset.x} y={contentOffset.y} scaleX={zoom} scaleY={zoom}>
                 <Rect
                   x={roomRect.x}
                   y={roomRect.y}
@@ -466,6 +878,200 @@ export default function LayoutStudio() {
                   />
                 ))}
 
+                {zones.map((zone) => {
+                  const isSelected = selectedZoneId === zone.id;
+                  const isDraggingZone = draggingZoneId === zone.id;
+
+                  return (
+                    <Group
+                      key={zone.id}
+                      x={zone.x}
+                      y={zone.y}
+                      draggable
+                      onClick={() => {
+                        setSelectedZoneId(zone.id);
+                        setSelectedId(null);
+                        setArmedType(null);
+                      }}
+                      onTap={() => {
+                        setSelectedZoneId(zone.id);
+                        setSelectedId(null);
+                        setArmedType(null);
+                      }}
+                      onDragStart={(event) => {
+                        event.target.getStage()?.container().style.setProperty("cursor", "grabbing");
+                        setDraggingZoneId(zone.id);
+                        setSelectedZoneId(zone.id);
+                        setSelectedId(null);
+                      }}
+                      onDragMove={(event) => {
+                        const nextRect = fitZoneRect({
+                          x: event.target.x(),
+                          y: event.target.y(),
+                          width: zone.width,
+                          height: zone.height
+                        });
+                        event.target.position({ x: nextRect.x, y: nextRect.y });
+                      }}
+                      onDragEnd={(event) => {
+                        const nextRect = fitZoneRect({
+                          x: event.target.x(),
+                          y: event.target.y(),
+                          width: zone.width,
+                          height: zone.height
+                        });
+                        event.target.position({ x: nextRect.x, y: nextRect.y });
+                        setZones((previous) =>
+                          previous.map((entry) =>
+                            entry.id === zone.id ? { ...entry, x: nextRect.x, y: nextRect.y } : entry
+                          )
+                        );
+                        setDraggingZoneId(null);
+                        event.target.getStage()?.container().style.setProperty("cursor", "default");
+                      }}
+                      onMouseEnter={(event) => {
+                        if (!draggingZoneId && !draggingId) {
+                          event.target.getStage()?.container().style.setProperty("cursor", "grab");
+                        }
+                      }}
+                      onMouseLeave={(event) => {
+                        if (!draggingZoneId && !draggingId) {
+                          event.target.getStage()?.container().style.setProperty("cursor", "default");
+                        }
+                      }}
+                    >
+                      <Rect
+                        width={zone.width}
+                        height={zone.height}
+                        cornerRadius={12}
+                        fill={`${zone.color}12`}
+                        stroke={`${zone.color}${isSelected ? "cc" : "66"}`}
+                        strokeWidth={isSelected ? 2 : 1.2}
+                        dash={isSelected ? [10, 6] : [6, 5]}
+                        shadowColor="#0f172a"
+                        shadowBlur={isDraggingZone ? 14 : 0}
+                        shadowOpacity={isDraggingZone ? 0.08 : 0}
+                        shadowOffsetY={isDraggingZone ? 4 : 0}
+                      />
+
+                      <Text
+                        x={10}
+                        y={10}
+                        width={Math.max(80, zone.width - 20)}
+                        text={zone.label}
+                        fontSize={12}
+                        fontStyle="bold"
+                        fill={zone.color}
+                        listening={false}
+                      />
+
+                      {isSelected && (
+                        <>
+                          <Group x={zone.width - 6} y={zone.height - 6} draggable
+                            onMouseDown={(event) => {
+                              event.cancelBubble = true;
+                            }}
+                            onTouchStart={(event) => {
+                              event.cancelBubble = true;
+                            }}
+                            onDragStart={(event) => {
+                              event.cancelBubble = true;
+                              setDraggingZoneId(zone.id);
+                            }}
+                            onDragMove={(event) => {
+                              event.cancelBubble = true;
+                              const nextRect = fitZoneRect({
+                                x: zone.x,
+                                y: zone.y,
+                                width: event.target.x() + 6,
+                                height: event.target.y() + 6
+                              });
+                              setZones((previous) =>
+                                previous.map((entry) =>
+                                  entry.id === zone.id
+                                    ? { ...entry, width: nextRect.width, height: nextRect.height }
+                                    : entry
+                                )
+                              );
+                            }}
+                            onDragEnd={(event) => {
+                              event.cancelBubble = true;
+                              const nextRect = fitZoneRect({
+                                x: zone.x,
+                                y: zone.y,
+                                width: event.target.x() + 6,
+                                height: event.target.y() + 6
+                              });
+                              setZones((previous) =>
+                                previous.map((entry) =>
+                                  entry.id === zone.id
+                                    ? { ...entry, width: nextRect.width, height: nextRect.height }
+                                    : entry
+                                )
+                              );
+                              setDraggingZoneId(null);
+                            }}
+                          >
+                            <Rect
+                              x={-6}
+                              y={-6}
+                              width={12}
+                              height={12}
+                              cornerRadius={4}
+                              fill="#ffffff"
+                              stroke={zone.color}
+                              strokeWidth={1.2}
+                            />
+                          </Group>
+
+                          <Group x={zone.width + 10} y={10}>
+                            <Group
+                              onMouseDown={(event) => {
+                                event.cancelBubble = true;
+                              }}
+                              onTouchStart={(event) => {
+                                event.cancelBubble = true;
+                              }}
+                              onClick={(event) => {
+                                event.cancelBubble = true;
+                                duplicateZone(zone.id);
+                              }}
+                              onTap={(event) => {
+                                event.cancelBubble = true;
+                                duplicateZone(zone.id);
+                              }}
+                            >
+                              <Circle radius={11} fill="#ffffff" stroke="rgba(15, 23, 42, 0.18)" />
+                              <Text x={-4} y={-6} text="+" fontSize={12} fill="#0f172a" />
+                            </Group>
+
+                            <Group
+                              y={28}
+                              onMouseDown={(event) => {
+                                event.cancelBubble = true;
+                              }}
+                              onTouchStart={(event) => {
+                                event.cancelBubble = true;
+                              }}
+                              onClick={(event) => {
+                                event.cancelBubble = true;
+                                removeZone(zone.id);
+                              }}
+                              onTap={(event) => {
+                                event.cancelBubble = true;
+                                removeZone(zone.id);
+                              }}
+                            >
+                              <Circle radius={11} fill="#fff4f4" stroke="rgba(220, 38, 38, 0.34)" />
+                              <Text x={-3.5} y={-6} text="×" fontSize={12} fill="#b42318" />
+                            </Group>
+                          </Group>
+                        </>
+                      )}
+                    </Group>
+                  );
+                })}
+
                 <Text
                   x={roomRect.x + 14}
                   y={roomRect.y + roomRect.height - 26}
@@ -477,6 +1083,7 @@ export default function LayoutStudio() {
 
                 {items.map((item) => {
                   const definition = LAYOUT_ITEM_BY_TYPE[item.type];
+                  const { width, height } = getItemDimensions(item);
                   const isSelected = selectedId === item.id;
                   const isDragging = draggingId === item.id;
 
@@ -485,35 +1092,59 @@ export default function LayoutStudio() {
                       key={item.id}
                       x={item.x}
                       y={item.y}
-                      offsetX={definition.footprint.width / 2}
-                      offsetY={definition.footprint.height / 2}
+                      offsetX={width / 2}
+                      offsetY={height / 2}
                       rotation={item.rotation}
                       draggable
                       onClick={() => {
                         setSelectedId(item.id);
+                        setSelectedZoneId(null);
                         setArmedType(null);
                       }}
                       onTap={() => {
                         setSelectedId(item.id);
+                        setSelectedZoneId(null);
                         setArmedType(null);
                       }}
                       onDragStart={(event) => {
                         event.target.getStage()?.container().style.setProperty("cursor", "grabbing");
                         setDraggingId(item.id);
                         setSelectedId(item.id);
+                        setSelectedZoneId(null);
+                        event.target.setAttr("lastValidX", item.x);
+                        event.target.setAttr("lastValidY", item.y);
                       }}
                       onDragMove={(event) => {
-                        const nextPosition = fitToRoom(item.type, event.target.x(), event.target.y());
-                        event.target.position(nextPosition);
+                        const nextPosition = fitItemToRoom(item, event.target.x(), event.target.y());
+                        const nextCandidate = { ...item, ...nextPosition };
+                        if (canPlaceItem(nextCandidate, item.id)) {
+                          event.target.position(nextPosition);
+                          event.target.setAttr("lastValidX", nextPosition.x);
+                          event.target.setAttr("lastValidY", nextPosition.y);
+                        } else {
+                          event.target.position({
+                            x: Number(event.target.getAttr("lastValidX")) || item.x,
+                            y: Number(event.target.getAttr("lastValidY")) || item.y
+                          });
+                        }
                       }}
                       onDragEnd={(event) => {
-                        const snappedPosition = fitToRoom(item.type, event.target.x(), event.target.y());
-                        event.target.position(snappedPosition);
-                        setItems((previous) =>
-                          previous.map((entry) =>
-                            entry.id === item.id ? { ...entry, ...snappedPosition } : entry
-                          )
-                        );
+                        const lastValid = {
+                          x: Number(event.target.getAttr("lastValidX")) || item.x,
+                          y: Number(event.target.getAttr("lastValidY")) || item.y
+                        };
+                        const snappedPosition = fitItemToRoom(item, lastValid.x, lastValid.y);
+                        const nextCandidate = { ...item, ...snappedPosition };
+                        if (canPlaceItem(nextCandidate, item.id)) {
+                          event.target.position(snappedPosition);
+                          setItems((previous) =>
+                            previous.map((entry) =>
+                              entry.id === item.id ? { ...entry, ...snappedPosition } : entry
+                            )
+                          );
+                        } else {
+                          event.target.position({ x: item.x, y: item.y });
+                        }
                         setDraggingId(null);
                         event.target.getStage()?.container().style.setProperty("cursor", "default");
                       }}
@@ -529,8 +1160,8 @@ export default function LayoutStudio() {
                       }}
                     >
                       <Rect
-                        width={definition.footprint.width}
-                        height={definition.footprint.height}
+                        width={width}
+                        height={height}
                         cornerRadius={14}
                         fill="#ffffff"
                         stroke="rgba(15, 23, 42, 0.1)"
@@ -545,8 +1176,8 @@ export default function LayoutStudio() {
                         <Rect
                           x={-4}
                           y={-4}
-                          width={definition.footprint.width + 8}
-                          height={definition.footprint.height + 8}
+                          width={width + 8}
+                          height={height + 8}
                           cornerRadius={16}
                           stroke="#1b5bd6"
                           strokeWidth={2}
@@ -554,13 +1185,13 @@ export default function LayoutStudio() {
                         />
                       )}
 
-                      <Group x={definition.footprint.width / 2} y={32} listening={false}>
+                      <Group x={width / 2} y={Math.min(36, Math.max(28, height * 0.38))} listening={false}>
                         <CanvasGlyph type={item.type} />
                       </Group>
 
                       <Text
-                        y={definition.footprint.height - 24}
-                        width={definition.footprint.width}
+                        y={Math.max(height - 24, 12)}
+                        width={width}
                         align="center"
                         text={definition.label}
                         fontSize={12}
@@ -568,8 +1199,53 @@ export default function LayoutStudio() {
                         listening={false}
                       />
 
+                      {isSelected && definition.resizable && (
+                        <Group
+                          x={width - 6}
+                          y={height - 6}
+                          draggable
+                          onMouseDown={(event) => {
+                            event.cancelBubble = true;
+                          }}
+                          onTouchStart={(event) => {
+                            event.cancelBubble = true;
+                          }}
+                          onDragMove={(event) => {
+                            event.cancelBubble = true;
+                            const next = fitItemResize(item, event.target.x() + 6, event.target.y() + 6);
+                            const nextCandidate = { ...item, ...next };
+                            if (!canPlaceItem(nextCandidate, item.id)) {
+                              event.target.position({ x: width - 6, y: height - 6 });
+                              return;
+                            }
+
+                            setItems((previous) =>
+                              previous.map((entry) =>
+                                entry.id === item.id ? { ...entry, ...next } : entry
+                              )
+                            );
+                            event.target.position({ x: next.width - 6, y: next.height - 6 });
+                          }}
+                          onDragEnd={(event) => {
+                            event.cancelBubble = true;
+                            event.target.position({ x: width - 6, y: height - 6 });
+                          }}
+                        >
+                          <Rect
+                            x={-6}
+                            y={-6}
+                            width={12}
+                            height={12}
+                            cornerRadius={4}
+                            fill="#ffffff"
+                            stroke="#1b5bd6"
+                            strokeWidth={1.2}
+                          />
+                        </Group>
+                      )}
+
                       {isSelected && (
-                        <Group x={definition.footprint.width + 10} y={10}>
+                        <Group x={width + 10} y={10}>
                           <Group
                             onMouseDown={(event) => {
                               event.cancelBubble = true;
@@ -636,6 +1312,7 @@ export default function LayoutStudio() {
                     </Group>
                   );
                 })}
+                </Group>
               </Layer>
             </Stage>
           </div>

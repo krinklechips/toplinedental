@@ -15,12 +15,52 @@ export type LayoutItem = {
   x: number;
   y: number;
   rotation: number;
+  width?: number;
+  height?: number;
+};
+
+export type LayoutZoneType =
+  | "operatory-room"
+  | "imaging-room"
+  | "sterilization-room"
+  | "consult-room"
+  | "reception-zone"
+  | "storage-zone";
+
+export type LayoutZone = {
+  id: string;
+  type: LayoutZoneType;
+  label: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  color: string;
 };
 
 export type LayoutItemDefinition = {
   type: LayoutItemType;
   label: string;
   footprint: {
+    width: number;
+    height: number;
+  };
+  resizable?: boolean;
+  minSize?: {
+    width: number;
+    height: number;
+  };
+  maxSize?: {
+    width: number;
+    height: number;
+  };
+};
+
+export type LayoutZoneDefinition = {
+  type: LayoutZoneType;
+  label: string;
+  color: string;
+  defaultSize: {
     width: number;
     height: number;
   };
@@ -49,7 +89,10 @@ export const LAYOUT_ITEM_DEFINITIONS: LayoutItemDefinition[] = [
   {
     type: "cabinet",
     label: "Cabinet",
-    footprint: { width: 132, height: 84 }
+    footprint: { width: 132, height: 84 },
+    resizable: true,
+    minSize: { width: 100, height: 70 },
+    maxSize: { width: 260, height: 140 }
   },
   {
     type: "sink",
@@ -69,12 +112,57 @@ export const LAYOUT_ITEM_DEFINITIONS: LayoutItemDefinition[] = [
   {
     type: "pc-workstation",
     label: "PC / Workstation",
-    footprint: { width: 128, height: 86 }
+    footprint: { width: 128, height: 86 },
+    resizable: true,
+    minSize: { width: 100, height: 74 },
+    maxSize: { width: 200, height: 120 }
   },
   {
     type: "reception-desk",
     label: "Reception Desk",
-    footprint: { width: 152, height: 90 }
+    footprint: { width: 152, height: 90 },
+    resizable: true,
+    minSize: { width: 120, height: 70 },
+    maxSize: { width: 320, height: 180 }
+  }
+];
+
+export const LAYOUT_ZONE_DEFINITIONS: LayoutZoneDefinition[] = [
+  {
+    type: "operatory-room",
+    label: "Operatory Room",
+    color: "#2f6fe6",
+    defaultSize: { width: 240, height: 180 }
+  },
+  {
+    type: "imaging-room",
+    label: "Imaging Room",
+    color: "#0e7490",
+    defaultSize: { width: 200, height: 160 }
+  },
+  {
+    type: "sterilization-room",
+    label: "Sterilization",
+    color: "#047857",
+    defaultSize: { width: 220, height: 160 }
+  },
+  {
+    type: "consult-room",
+    label: "Consult Room",
+    color: "#7c3aed",
+    defaultSize: { width: 180, height: 140 }
+  },
+  {
+    type: "reception-zone",
+    label: "Reception",
+    color: "#b45309",
+    defaultSize: { width: 240, height: 140 }
+  },
+  {
+    type: "storage-zone",
+    label: "Storage / Utility",
+    color: "#475569",
+    defaultSize: { width: 180, height: 120 }
   }
 ];
 
@@ -82,5 +170,12 @@ export const LAYOUT_ITEM_BY_TYPE = Object.fromEntries(
   LAYOUT_ITEM_DEFINITIONS.map((definition) => [definition.type, definition])
 ) as Record<LayoutItemType, LayoutItemDefinition>;
 
+export const LAYOUT_ZONE_BY_TYPE = Object.fromEntries(
+  LAYOUT_ZONE_DEFINITIONS.map((definition) => [definition.type, definition])
+) as Record<LayoutZoneType, LayoutZoneDefinition>;
+
 export const isLayoutItemType = (value: string): value is LayoutItemType =>
   LAYOUT_ITEM_DEFINITIONS.some((definition) => definition.type === value);
+
+export const isLayoutZoneType = (value: string): value is LayoutZoneType =>
+  LAYOUT_ZONE_DEFINITIONS.some((definition) => definition.type === value);

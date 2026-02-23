@@ -31,6 +31,7 @@ export default function SiteLayout() {
                 <Link to="/products">Imaging Systems</Link>
                 <Link to="/products">Sterilization Systems</Link>
                 <Link to="/products">Water Filtration</Link>
+                <Link to="/products">Dental Materials &amp; Consumables</Link>
               </div>
               <div className="mega-col">
                 <p className="mega-label">Euronda Line</p>

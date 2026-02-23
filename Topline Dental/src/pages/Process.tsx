@@ -8,7 +8,55 @@ type ProcessSectionProps = {
   className?: string;
 };
 
-const processIcons = ["C", "S", "I", "A"];
+type ProcessIconKey = "consultation" | "specification" | "installation" | "aftercare";
+
+const processIcons: ProcessIconKey[] = [
+  "consultation",
+  "specification",
+  "installation",
+  "aftercare"
+];
+
+function ProcessStepIcon({ kind }: { kind: ProcessIconKey }) {
+  if (kind === "consultation") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M5 7.5A2.5 2.5 0 0 1 7.5 5h9A2.5 2.5 0 0 1 19 7.5v6A2.5 2.5 0 0 1 16.5 16h-5l-3.5 3v-3H7.5A2.5 2.5 0 0 1 5 13.5z" />
+        <path d="M9 9.5h6" />
+        <path d="M9 12.5h4" />
+      </svg>
+    );
+  }
+
+  if (kind === "specification") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M8 5h8l3 3v11a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z" />
+        <path d="M16 5v4h4" />
+        <path d="M9 13h6" />
+        <path d="M9 16h4" />
+      </svg>
+    );
+  }
+
+  if (kind === "installation") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M14 6l4 4" />
+        <path d="M3 21l5.5-1.5L19 9a1.41 1.41 0 0 0 0-2l-2-2a1.41 1.41 0 0 0-2 0L4.5 15.5z" />
+        <path d="M12.5 7.5l4 4" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 21a8 8 0 1 0-8-8" />
+      <path d="M12 7v5l3 2" />
+      <path d="M7 21H3v-4" />
+    </svg>
+  );
+}
 
 export function ProcessSection({
   eyebrow = "Process",
@@ -241,7 +289,9 @@ export function ProcessSection({
         >
           {engagementSteps.map((step, index) => (
             <article key={step.title} className="process-carousel-card">
-              <span className="process-carousel-icon">{processIcons[index]}</span>
+              <span className="process-carousel-icon">
+                <ProcessStepIcon kind={processIcons[index] ?? "consultation"} />
+              </span>
               <h3>{step.title}</h3>
               <p>{step.detail}</p>
             </article>

@@ -1,15 +1,17 @@
 type StudioToolbarProps = {
-  hasSelection: boolean;
+  selectionLabel: string;
   onReset: () => void;
   onExportPng: () => void;
   onExportJson: () => void;
+  onEmailSales: () => void;
 };
 
 export default function StudioToolbar({
-  hasSelection,
+  selectionLabel,
   onReset,
   onExportPng,
-  onExportJson
+  onExportJson,
+  onEmailSales
 }: StudioToolbarProps) {
   return (
     <div className="layout-toolbar">
@@ -18,11 +20,14 @@ export default function StudioToolbar({
         <h2>Clinic Layout Studio</h2>
         <p className="layout-toolbar-note">
           Drag items into the room, rotate with <kbd>R</kbd>, delete with <kbd>Delete</kbd>, duplicate
-          with <kbd>Cmd/Ctrl + D</kbd>.
+          with <kbd>Cmd/Ctrl + D</kbd>. Add room zones first, then place equipment inside them.
         </p>
       </div>
 
       <div className="layout-toolbar-actions">
+        <button type="button" className="button ghost" onClick={onEmailSales}>
+          Email Sales
+        </button>
         <button type="button" className="button ghost" onClick={onExportPng}>
           Export PNG
         </button>
@@ -32,8 +37,8 @@ export default function StudioToolbar({
         <button type="button" className="button ghost" onClick={onReset}>
           Reset
         </button>
-        <span className={`layout-selection-chip${hasSelection ? " active" : ""}`}>
-          {hasSelection ? "Item selected" : "No selection"}
+        <span className={`layout-selection-chip${selectionLabel !== "No selection" ? " active" : ""}`}>
+          {selectionLabel}
         </span>
       </div>
     </div>
