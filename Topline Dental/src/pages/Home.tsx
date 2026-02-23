@@ -54,7 +54,8 @@ export default function Home() {
           muted
           loop
           playsInline
-          poster="/topline-logo.png"
+          preload="metadata"
+          aria-hidden="true"
         >
           <source src="/hero-background.mp4" type="video/mp4" />
         </video>
