@@ -77,10 +77,10 @@ export default function Contact() {
       <div className="contact-page-shell">
         <div className="contact-hero-head section-heading">
           <p className="eyebrow">Contact</p>
-          <h2>Share your project scope, replacement needs, or consumables enquiry.</h2>
+          <h2>Tell us what you need and we will recommend the right next step.</h2>
           <p className="section-subtitle">
-            Tell us whether this is a startup, expansion, replacement, sterilization workflow
-            upgrade, or recurring consumables request and we will respond with the right next step.
+            Startups, clinic expansions, replacement projects, sterilization workflow upgrades, and
+            recurring consumables enquiries are all supported through the same contact team.
           </p>
         </div>
 
@@ -88,7 +88,14 @@ export default function Contact() {
           <div className="contact-inline-item">
             <p className="contact-label">Sales &amp; Project Contact</p>
             <p className="contact-detail">Carey</p>
-            <p className="contact-address">carey@toplinedc.com • +60 16-909 0913</p>
+            <div className="contact-link-stack">
+              <a className="contact-link" href="mailto:carey@toplinedc.com">
+                carey@toplinedc.com
+              </a>
+              <a className="contact-link" href="tel:+60169090913">
+                +60 16-909 0913
+              </a>
+            </div>
           </div>
           <div className="contact-inline-item">
             <p className="contact-label">Office</p>
@@ -97,10 +104,22 @@ export default function Contact() {
               Selangor D.E., Malaysia
             </p>
           </div>
-          <div className="contact-inline-pills pill-row">
-            <span className="pill">Quote response target: 24-48h</span>
-            <span className="pill">Site review / consult scheduling available</span>
-            <span className="pill">Equipment + consumables enquiries</span>
+          <div className="contact-inline-item contact-inline-item--meta">
+            <p className="contact-label">Quick Facts</p>
+            <div className="contact-meta-list">
+              <div className="contact-meta-row">
+                <span className="contact-meta-label">Response</span>
+                <span className="contact-meta-value">24-48h target</span>
+              </div>
+              <div className="contact-meta-row">
+                <span className="contact-meta-label">Support</span>
+                <span className="contact-meta-value">Equipment + consumables</span>
+              </div>
+              <div className="contact-meta-row">
+                <span className="contact-meta-label">Visit</span>
+                <span className="contact-meta-value">Site review scheduling available</span>
+              </div>
+            </div>
           </div>
         </div>
 

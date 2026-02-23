@@ -2403,7 +2403,7 @@ kbd {
 
 .contact-page-shell {
   display: grid;
-  gap: 22px;
+  gap: 18px;
   max-width: 1120px;
   margin: 0 auto;
   padding: 0 7vw;
@@ -2411,24 +2411,31 @@ kbd {
 
 .contact-hero-head {
   text-align: center;
-  max-width: 860px;
+  max-width: 760px;
   margin: 0 auto;
 }
 
-.contact-hero-head .section-subtitle {
-  max-width: 720px;
+.contact-hero-head h2 {
+  max-width: 18ch;
   margin-inline: auto;
+  line-height: 1.14;
+  font-size: clamp(28px, 3vw, 42px);
+}
+
+.contact-hero-head .section-subtitle {
+  max-width: 62ch;
+  margin-inline: auto;
+  font-size: 16px;
 }
 
 .contact-inline-strip {
   display: grid;
-  grid-template-columns: 1fr 1.35fr;
+  grid-template-columns: minmax(240px, 0.95fr) minmax(320px, 1.35fr) minmax(240px, 1fr);
   gap: 14px;
   align-items: stretch;
 }
 
-.contact-inline-item,
-.contact-inline-pills {
+.contact-inline-item {
   background: var(--surface);
   border: var(--card-border);
   border-radius: var(--radius-lg);
@@ -2438,22 +2445,7 @@ kbd {
 
 .contact-inline-item {
   display: grid;
-  gap: 6px;
-}
-
-.contact-inline-pills {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-items: center;
-  align-content: center;
-  gap: 10px;
-  min-width: 0;
-  grid-column: 1 / -1;
-}
-
-.contact-inline-pills .pill {
-  justify-content: flex-start;
+  gap: 8px;
 }
 
 .contact-label {
@@ -2461,6 +2453,55 @@ kbd {
   text-transform: uppercase;
   letter-spacing: 0.2em;
   color: var(--muted);
+  font-weight: 600;
+}
+
+.contact-link-stack {
+  display: grid;
+  gap: 4px;
+}
+
+.contact-link {
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.contact-link:hover {
+  color: var(--accent);
+}
+
+.contact-inline-item--meta {
+  align-content: start;
+}
+
+.contact-meta-list {
+  display: grid;
+  gap: 8px;
+}
+
+.contact-meta-row {
+  display: grid;
+  gap: 3px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: #f8fbff;
+  border: 1px solid rgba(27, 91, 214, 0.08);
+}
+
+.contact-meta-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--accent-strong);
+  font-weight: 700;
+}
+
+.contact-meta-value {
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--ink);
   font-weight: 600;
 }
 
@@ -3071,15 +3112,6 @@ kbd {
     grid-template-columns: 1fr;
   }
 
-  .contact-inline-pills {
-    justify-content: flex-start;
-    grid-column: auto;
-  }
-
-  .contact-inline-pills .pill {
-    justify-content: flex-start;
-  }
-
   .contact-form-layout {
     grid-template-columns: 1fr;
     gap: 16px;
@@ -3289,7 +3321,6 @@ kbd {
   }
 
   .contact-inline-item,
-  .contact-inline-pills,
   .contact-form-card {
     padding: 18px;
   }
