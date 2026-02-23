@@ -77,6 +77,11 @@ export default function SiteLayout() {
               </div>
             </div>
           </div>
+          <div className="nav-item">
+            <NavLink className={({ isActive }) => `nav-link${isActive ? " active" : ""}`} to="/layout-studio">
+              Layout Studio
+            </NavLink>
+          </div>
           <NavLink className={({ isActive }) => `nav-cta${isActive ? " active" : ""}`} to="/contact">
             Contact
           </NavLink>
@@ -99,6 +104,7 @@ export default function SiteLayout() {
           <Link to="/">Solutions</Link>
           <Link to="/products">Products</Link>
           <Link to="/process">Process</Link>
+          <Link to="/layout-studio">Layout Studio</Link>
           <Link to="/company">Company</Link>
           <Link to="/contact">Contact</Link>
         </div>

@@ -1,6 +1,6 @@
-import eurondaE8 from "../public/euronda_e8_apertura-edited.jpg";
-import eurondaAquafilter from "../public/euronda_aquafilter1to1-1-edited-1.jpg";
-import eurondaThermodisinfectors from "../public/euronda_prosystem_cleaning_eurosafe_thermodisinfectors-ok.jpg";
+import eurondaE8 from "../assets/euronda-e8-apertura-edited.jpg";
+import eurondaAquafilter from "../assets/euronda-aquafilter-1to1-edited-1.jpg";
+import eurondaThermodisinfectors from "../assets/euronda-prosystem-cleaning-eurosafe-thermodisinfectors-ok.jpg";
 
 export const solutions = [
   {

@@ -5,6 +5,7 @@ import Products from "./pages/Products";
 import Process from "./pages/Process";
 import Company from "./pages/Company";
 import Contact from "./pages/Contact";
+import LayoutStudio from "./pages/LayoutStudio";
 import NotFound from "./pages/NotFound";
 
 export default function App() {
@@ -14,6 +15,8 @@ export default function App() {
         <Route index element={<Home />} />
         <Route path="products" element={<Products />} />
         <Route path="process" element={<Process />} />
+        <Route path="layout-studio" element={<LayoutStudio />} />
+        <Route path="layout" element={<LayoutStudio />} />
         <Route path="company" element={<Company />} />
         <Route path="contact" element={<Contact />} />
         <Route path="*" element={<NotFound />} />

@@ -1,0 +1,11 @@
+{
+  "installCommand": "cd \"Topline Dental\" && npm install",
+  "buildCommand": "cd \"Topline Dental\" && npm run build",
+  "outputDirectory": "Topline Dental/dist",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
