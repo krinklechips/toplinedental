@@ -77,16 +77,16 @@ export default function Contact() {
       <div className="contact-page-shell">
         <div className="contact-hero-head section-heading">
           <p className="eyebrow">Contact</p>
-          <h2>Tell us what you need. We will respond within one business day.</h2>
+          <h2>Share your project scope, replacement needs, or consumables enquiry.</h2>
           <p className="section-subtitle">
-            Share your clinic goals, preferred equipment, or project timeline and our team will
-            prepare the right recommendation.
+            Tell us whether this is a startup, expansion, replacement, sterilization workflow
+            upgrade, or recurring consumables request and we will respond with the right next step.
           </p>
         </div>
 
         <div className="contact-inline-strip">
           <div className="contact-inline-item">
-            <p className="contact-label">Primary Contact</p>
+            <p className="contact-label">Sales &amp; Project Contact</p>
             <p className="contact-detail">Carey</p>
             <p className="contact-address">carey@toplinedc.com • +60 16-909 0913</p>
           </div>
@@ -98,8 +98,9 @@ export default function Contact() {
             </p>
           </div>
           <div className="contact-inline-pills pill-row">
-            <span className="pill">Quote turnaround 24-48h</span>
-            <span className="pill">On-site consults available</span>
+            <span className="pill">Quote response target: 24-48h</span>
+            <span className="pill">Site review / consult scheduling available</span>
+            <span className="pill">Equipment + consumables enquiries</span>
           </div>
         </div>
 
@@ -186,7 +187,7 @@ export default function Contact() {
                       name="companyName"
                       value={form.companyName}
                       onChange={handleChange}
-                      placeholder="Topline Dental Clinic"
+                      placeholder="Clinic or company name"
                       className="form-input"
                     />
                   </div>
@@ -201,7 +202,7 @@ export default function Contact() {
                       name="location"
                       value={form.location}
                       onChange={handleChange}
-                      placeholder="City, State"
+                      placeholder="City, State / Region"
                       className="form-input"
                     />
                   </div>
@@ -326,14 +327,14 @@ export default function Contact() {
                     onChange={handleChange}
                     required
                     rows={5}
-                    placeholder="Share your equipment needs, current setup, or any special requirements."
+                    placeholder="Example: 4-chair expansion, panoramic imaging upgrade, sterilization room redesign, or monthly consumables support."
                     className="form-input form-textarea"
                   />
                 </div>
 
                 <p className="form-helper contact-form-helper">
-                  Include only what you know now. We can refine the specification during the first
-                  consultation.
+                  Include what you know now (room count, preferred brands, budget range, timeline,
+                  or current equipment). We can refine the specification during the first call.
                 </p>
               </div>
 
@@ -347,8 +348,8 @@ export default function Contact() {
           ) : (
             <div className="form-success">
               <div className="success-icon">✓</div>
-              <h3>Thanks — message received!</h3>
-              <p>We will be in touch within one business day.</p>
+              <h3>Thanks, your request has been received.</h3>
+              <p>We will follow up within one business day to confirm scope and next steps.</p>
               <button
                 className="button ghost"
                 type="button"

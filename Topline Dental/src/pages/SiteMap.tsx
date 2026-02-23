@@ -27,6 +27,7 @@ const groups = [
       { to: "/products#imaging", label: "Imaging Systems" },
       { to: "/products#sterilization", label: "Sterilization Systems" },
       { to: "/products#water-filtration", label: "Water Filtration" },
+      { to: "/products#small-equipment", label: "Handpieces & Small Equipment" },
       { to: "/materials", label: "Materials & Consumables" }
     ]
   },

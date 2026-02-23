@@ -1,8 +1,18 @@
-import { Link, NavLink, Outlet } from "react-router-dom";
+import { useEffect, useState, type FormEvent } from "react";
+import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { companyIdentity } from "../data/siteContent";
 
 export default function SiteLayout() {
+  const location = useLocation();
   const currentYear = new Date().getFullYear();
+  const [newsletterOpen, setNewsletterOpen] = useState(false);
+  const [newsletterSubmitted, setNewsletterSubmitted] = useState(false);
+  const [newsletterForm, setNewsletterForm] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    country: "Malaysia"
+  });
   const footerLicenseLines = [
     { label: "MDA AR", reference: "MDA-9146-W125" },
     { label: "MDA Importer", reference: "MDA-9447-P125" },
@@ -19,7 +29,8 @@ export default function SiteLayout() {
             { to: "/products#operatories", label: "Dental Chairs & Units" },
             { to: "/products#imaging", label: "Imaging Systems" },
             { to: "/products#sterilization", label: "Sterilization Systems" },
-            { to: "/products#water-filtration", label: "Water Filtration" }
+            { to: "/products#water-filtration", label: "Water Filtration" },
+            { to: "/products#small-equipment", label: "Handpieces & Small Equipment" }
           ]
         },
         {
@@ -75,9 +86,208 @@ export default function SiteLayout() {
     }
   ] as const;
 
+  useEffect(() => {
+    if (location.pathname !== "/") {
+      return;
+    }
+
+    const dismissed = window.sessionStorage.getItem("topline-newsletter-dismissed");
+    if (dismissed === "1") {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      setNewsletterOpen(true);
+    }, 1400);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (!newsletterOpen) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setNewsletterOpen(false);
+        window.sessionStorage.setItem("topline-newsletter-dismissed", "1");
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [newsletterOpen]);
+
+  const closeNewsletter = () => {
+    setNewsletterOpen(false);
+    window.sessionStorage.setItem("topline-newsletter-dismissed", "1");
+  };
+
+  const handleNewsletterSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setNewsletterSubmitted(true);
+    window.sessionStorage.setItem("topline-newsletter-dismissed", "1");
+  };
+
   return (
     <div className="page">
       <div className="bg-grid" aria-hidden="true" />
+
+      {newsletterOpen && (
+        <div
+          className="newsletter-modal-backdrop"
+          role="presentation"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) {
+              closeNewsletter();
+            }
+          }}
+        >
+          <section
+            className="newsletter-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="newsletter-modal-title"
+            aria-describedby="newsletter-modal-description"
+          >
+            <button
+              type="button"
+              className="newsletter-modal-close"
+              aria-label="Close newsletter signup"
+              onClick={closeNewsletter}
+            >
+              ×
+            </button>
+
+            {!newsletterSubmitted ? (
+              <>
+                <div className="newsletter-modal-head">
+                  <p className="newsletter-modal-kicker">Topline Clinical Updates</p>
+                  <h2 id="newsletter-modal-title">
+                    Design, technology and practical upgrades for modern clinics.
+                  </h2>
+                  <p id="newsletter-modal-description">
+                    Subscribe for product updates, sterilization workflow tips, and selected
+                    equipment planning insights from Topline Dental Concept.
+                  </p>
+                </div>
+
+                <form className="newsletter-modal-form" onSubmit={handleNewsletterSubmit}>
+                  <div className="newsletter-modal-grid">
+                    <label className="newsletter-field">
+                      <span>First Name</span>
+                      <input
+                        type="text"
+                        value={newsletterForm.firstName}
+                        onChange={(event) =>
+                          setNewsletterForm((prev) => ({
+                            ...prev,
+                            firstName: event.target.value
+                          }))
+                        }
+                        required
+                        autoComplete="given-name"
+                        placeholder="Carey"
+                      />
+                    </label>
+
+                    <label className="newsletter-field">
+                      <span>Last Name</span>
+                      <input
+                        type="text"
+                        value={newsletterForm.lastName}
+                        onChange={(event) =>
+                          setNewsletterForm((prev) => ({
+                            ...prev,
+                            lastName: event.target.value
+                          }))
+                        }
+                        required
+                        autoComplete="family-name"
+                        placeholder="Tan"
+                      />
+                    </label>
+                  </div>
+
+                  <label className="newsletter-field">
+                    <span>Email</span>
+                    <input
+                      type="email"
+                      value={newsletterForm.email}
+                      onChange={(event) =>
+                        setNewsletterForm((prev) => ({
+                          ...prev,
+                          email: event.target.value
+                        }))
+                      }
+                      required
+                      autoComplete="email"
+                      placeholder="you@clinic.com"
+                    />
+                  </label>
+
+                  <label className="newsletter-field">
+                    <span>Country</span>
+                    <select
+                      value={newsletterForm.country}
+                      onChange={(event) =>
+                        setNewsletterForm((prev) => ({
+                          ...prev,
+                          country: event.target.value
+                        }))
+                      }
+                    >
+                      <option>Malaysia</option>
+                      <option>Singapore</option>
+                      <option>Indonesia</option>
+                      <option>Thailand</option>
+                      <option>Brunei</option>
+                      <option>Philippines</option>
+                      <option>Other</option>
+                    </select>
+                  </label>
+
+                  <div className="newsletter-modal-actions">
+                    <button type="submit" className="button newsletter-submit-button">
+                      Sign up for newsletter
+                    </button>
+                    <button
+                      type="button"
+                      className="newsletter-secondary-link"
+                      onClick={closeNewsletter}
+                    >
+                      Maybe later
+                    </button>
+                  </div>
+                </form>
+              </>
+            ) : (
+              <div className="newsletter-modal-success">
+                <p className="newsletter-modal-kicker">Subscription Received</p>
+                <h2 id="newsletter-modal-title">Thanks for subscribing.</h2>
+                <p id="newsletter-modal-description">
+                  This popup is now ready for CRM integration. Next step is connecting the submit
+                  action to your newsletter platform (Mailchimp, Brevo, HubSpot, etc.).
+                </p>
+                <div className="newsletter-modal-actions">
+                  <button type="button" className="button newsletter-submit-button" onClick={closeNewsletter}>
+                    Close
+                  </button>
+                </div>
+              </div>
+            )}
+          </section>
+        </div>
+      )}
 
       <header className="site-header">
         <Link className="brand" to="/">
@@ -105,6 +315,7 @@ export default function SiteLayout() {
                 <Link to="/products#imaging">Imaging Systems</Link>
                 <Link to="/products#sterilization">Sterilization Systems</Link>
                 <Link to="/products#water-filtration">Water Filtration</Link>
+                <Link to="/products#small-equipment">Handpieces &amp; Small Equipment</Link>
                 <p className="mega-label">Materials</p>
                 <Link to="/materials">Dental Materials &amp; Consumables</Link>
                 <Link to="/materials">Orthodontic Consumables</Link>

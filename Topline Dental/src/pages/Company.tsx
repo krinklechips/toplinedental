@@ -18,27 +18,29 @@ export default function Company() {
             <span className="pill">Dental chairs</span>
             <span className="pill">Imaging systems</span>
             <span className="pill">Sterilization</span>
+            <span className="pill">Utility support systems</span>
             <span className="pill">Materials &amp; consumables</span>
           </div>
         </div>
         <div className="company-panel highlight-panel">
           <p className="eyebrow">Highlights</p>
-          <h3>Professional procurement, aligned to clinical outcomes.</h3>
+          <h3>Commercial support built around clinic rollout and continuity.</h3>
           <ul className="highlight-list">
-            <li>Dedicated point of contact for every clinic engagement.</li>
-            <li>Equipment selection aligned to workflow, space, and budget.</li>
-            <li>Installation guidance and aftercare support.</li>
-            <li>Support for both equipment systems and day-to-day clinical supplies.</li>
+            <li>Single point of contact for quotations, coordination, and follow-up.</li>
+            <li>Equipment recommendations aligned to room layout, utilities, and treatment scope.</li>
+            <li>Support for startup, expansion, replacement, and phased upgrade projects.</li>
+            <li>Consumables sourcing support for recurring clinic operations and specialty needs.</li>
           </ul>
         </div>
       </div>
 
       <div className="company-panel company-licensing-panel">
         <p className="eyebrow">Licensing &amp; Compliance</p>
-        <h3>Regulatory references for medical device distribution and support.</h3>
+        <h3>Procurement onboarding references for device distribution and operations.</h3>
         <p className="company-licensing-lead">
-          Key registration and licensing references are listed below for procurement
-          review and clinic onboarding documentation.
+          Key registration and licensing references are listed below for procurement review and
+          vendor onboarding. The dedicated Governance page provides a consolidated compliance
+          overview for documentation requests.
         </p>
         <div className="company-licensing-grid">
           {complianceCredentials.map((credential) => (
@@ -51,8 +53,8 @@ export default function Company() {
           ))}
         </div>
         <p className="company-license-footnote">
-          Reference numbers are shown from the documents on file provided for
-          validation. Full copies and validity periods can be shared upon request.
+          Reference numbers are shown from documents on file for validation. Full copies, issuer
+          details, and validity periods can be shared during procurement onboarding.
         </p>
       </div>
     </section>
