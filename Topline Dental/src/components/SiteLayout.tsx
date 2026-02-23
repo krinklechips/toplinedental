@@ -31,7 +31,9 @@ export default function SiteLayout() {
                 <Link to="/products">Imaging Systems</Link>
                 <Link to="/products">Sterilization Systems</Link>
                 <Link to="/products">Water Filtration</Link>
-                <Link to="/products">Dental Materials &amp; Consumables</Link>
+                <p className="mega-label">Materials</p>
+                <Link to="/materials">Dental Materials &amp; Consumables</Link>
+                <Link to="/materials">Orthodontic Consumables</Link>
               </div>
               <div className="mega-col">
                 <p className="mega-label">Euronda Line</p>
@@ -109,6 +111,7 @@ export default function SiteLayout() {
           <p className="footer-label">Navigate</p>
           <Link to="/">Solutions</Link>
           <Link to="/products">Products</Link>
+          <Link to="/materials">Materials</Link>
           <Link to="/process">Process</Link>
           <Link to="/layout-studio">Layout Studio</Link>
           <Link to="/company">Company</Link>

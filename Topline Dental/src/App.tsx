@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import SiteLayout from "./components/SiteLayout";
 import Home from "./pages/Home";
 import Products from "./pages/Products";
+import Materials from "./pages/Materials";
 import Process from "./pages/Process";
 import Company from "./pages/Company";
 import Contact from "./pages/Contact";
@@ -15,6 +16,7 @@ export default function App() {
       <Route element={<SiteLayout />}>
         <Route index element={<Home />} />
         <Route path="products" element={<Products />} />
+        <Route path="materials" element={<Materials />} />
         <Route path="process" element={<Process />} />
         <Route path="layout-studio" element={<LayoutStudio />} />
         <Route path="layout" element={<LayoutStudio />} />

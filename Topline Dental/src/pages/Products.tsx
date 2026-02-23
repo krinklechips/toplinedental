@@ -1,15 +1,14 @@
-import { materialLineup, productHighlights } from "../data/siteContent";
+import { productHighlights } from "../data/siteContent";
 
 export default function Products() {
   return (
     <section className="section">
       <div className="section-heading">
-        <p className="eyebrow">Product Catalogue</p>
-        <h2>Clinical equipment plus dental materials and consumables.</h2>
+        <p className="eyebrow">Equipment Systems</p>
+        <h2>Clinical equipment systems for sterilization and hygiene workflows.</h2>
         <p className="section-subtitle">
-          Browse equipment systems separately from our dental materials and consumables lineup. The
-          materials section below focuses on day-to-day clinical consumables across multiple
-          disciplines.
+          This page focuses on equipment systems. Dental materials and consumables are listed
+          separately in the dedicated Materials section of the website.
         </p>
       </div>
 
@@ -34,42 +33,6 @@ export default function Products() {
             </div>
             <h3>{product.title}</h3>
             <p>{product.detail}</p>
-          </article>
-        ))}
-      </div>
-
-      <div className="section-copy products-materials-copy">
-        <p className="eyebrow">Dental Materials</p>
-        <h3>Materials and consumables lineup (separate from equipment systems).</h3>
-        <p>
-          This section covers materials and consumables only, including restorative, orthodontic,
-          endodontic, preventive, surgical, and everyday chairside categories.
-        </p>
-        <div className="pill-row">
-          <span className="pill">Restorative</span>
-          <span className="pill">Orthodontics</span>
-          <span className="pill">Impression</span>
-          <span className="pill">Endodontic</span>
-          <span className="pill">Hygiene / Preventive</span>
-          <span className="pill">Surgical</span>
-          <span className="pill">Disposables</span>
-          <span className="pill">Consumables</span>
-        </div>
-      </div>
-
-      <div className="grid-3">
-        {materialLineup.map((material) => (
-          <article key={material.title} className="card">
-            <p className="card-tag">{material.tag}</p>
-            <h3>{material.title}</h3>
-            <p>{material.description}</p>
-            <div className="pill-row">
-              {material.examples.map((example) => (
-                <span key={example} className="pill">
-                  {example}
-                </span>
-              ))}
-            </div>
           </article>
         ))}
       </div>
