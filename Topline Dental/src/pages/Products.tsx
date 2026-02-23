@@ -4,11 +4,12 @@ export default function Products() {
   return (
     <section className="section">
       <div className="section-heading">
-        <p className="eyebrow">Products & Materials</p>
-        <h2>Equipment systems and dental materials for complete clinic workflows.</h2>
+        <p className="eyebrow">Product Catalogue</p>
+        <h2>Clinical equipment plus dental materials and consumables.</h2>
         <p className="section-subtitle">
-          Beyond equipment planning, we also support clinics with day-to-day dental materials and
-          consumables used across restorative, hygiene, and procedural workflows.
+          Browse equipment systems separately from our dental materials and consumables lineup. The
+          materials section below focuses on day-to-day clinical consumables across multiple
+          disciplines.
         </p>
       </div>
 
@@ -39,16 +40,19 @@ export default function Products() {
 
       <div className="section-copy products-materials-copy">
         <p className="eyebrow">Dental Materials</p>
-        <h3>Clinical materials and consumables to support daily treatment delivery.</h3>
+        <h3>Materials and consumables lineup (separate from equipment systems).</h3>
         <p>
-          We can support procurement across key material categories used in restorative, preventive,
-          endodontic, prosthetic, and infection-control workflows.
+          This section covers materials and consumables only, including restorative, orthodontic,
+          endodontic, preventive, surgical, and everyday chairside categories.
         </p>
         <div className="pill-row">
           <span className="pill">Restorative</span>
+          <span className="pill">Orthodontics</span>
           <span className="pill">Impression</span>
           <span className="pill">Endodontic</span>
           <span className="pill">Hygiene / Preventive</span>
+          <span className="pill">Surgical</span>
+          <span className="pill">Disposables</span>
           <span className="pill">Consumables</span>
         </div>
       </div>

@@ -91,11 +91,25 @@ export const materialLineup = [
     examples: ["Alginate", "Vinyl polysiloxane (VPS)", "Bite registration materials"]
   },
   {
+    title: "Orthodontic Materials & Consumables",
+    tag: "Bonding • Elastomerics • Chairside Ortho Supplies",
+    description:
+      "Chairside orthodontic consumables used for bonding, ligation, finishing, and routine adjustments in orthodontic treatment workflows.",
+    examples: ["Bracket bonding consumables", "Elastomeric ligatures / chains", "Orthodontic wax & accessories"]
+  },
+  {
     title: "Endodontic Consumables",
     tag: "Obturation • Irrigation • Sealers",
     description:
       "Core root canal consumables and supporting materials for shaping, irrigation, obturation, and sealing protocols.",
     examples: ["Gutta-percha / obturation materials", "Endo sealers", "Irrigation materials"]
+  },
+  {
+    title: "Surgical & Implant Consumables",
+    tag: "Procedure Consumables",
+    description:
+      "Consumables and supporting materials used in oral surgery and implant-related procedures, prep, and post-op workflow support.",
+    examples: ["Surgical drapes / disposables", "Sutures & hemostatic materials", "Procedure setup consumables"]
   },
   {
     title: "Preventive & Hygiene Materials",
@@ -105,11 +119,39 @@ export const materialLineup = [
     examples: ["Prophy and preventive products", "Surface barriers / disposables", "Sterilization consumables"]
   },
   {
+    title: "Disposables & Infection Control Consumables",
+    tag: "PPE • Barriers • Sterilization Support",
+    description:
+      "Single-use clinic consumables for chairside protection, cross-contamination control, and sterilization packaging workflows.",
+    examples: ["Barrier films and sleeves", "Patient bibs / cups / suction tips", "Sterilization pouches and wraps"]
+  },
+  {
     title: "Finishing, Polishing & Chairside Accessories",
     tag: "Workflow Consumables",
     description:
       "Chairside materials and accessories used to complete restorative procedures efficiently and consistently.",
     examples: ["Finishing and polishing consumables", "Mixing and dispensing accessories", "Matrices and wedges"]
+  },
+  {
+    title: "Whitening & Cosmetic Consumables",
+    tag: "Aesthetic Procedures",
+    description:
+      "Chairside and take-home whitening support consumables plus accessories used in cosmetic treatment workflows.",
+    examples: ["Whitening gels / kits", "Retractors and trays", "Shade and finishing accessories"]
+  },
+  {
+    title: "Anesthesia & Procedure Support Consumables",
+    tag: "Chairside Procedure Prep",
+    description:
+      "Common procedure support consumables used for patient preparation and routine treatment delivery across disciplines.",
+    examples: ["Topical prep materials", "Dispensing accessories", "Chairside setup consumables"]
+  },
+  {
+    title: "Pediatric & General Practice Consumables",
+    tag: "Everyday Clinical Use",
+    description:
+      "High-turnover consumables used across general and pediatric practice for preventive, restorative, and routine chairside care.",
+    examples: ["Fluoride / preventive consumables", "Isolation accessories", "Disposable chairside supplies"]
   },
   {
     title: "Lab & Digital Workflow Materials",
@@ -182,5 +224,6 @@ export const equipmentFocusOptions = [
   "Sterilization systems",
   "Water filtration",
   "Dental materials & consumables",
+  "Orthodontic materials / consumables",
   "Accessories & consumables"
 ];

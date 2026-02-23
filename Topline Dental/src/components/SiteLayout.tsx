@@ -79,8 +79,13 @@ export default function SiteLayout() {
             </div>
           </div>
           <div className="nav-item">
-            <NavLink className={({ isActive }) => `nav-link${isActive ? " active" : ""}`} to="/layout-studio">
-              Layout Studio
+            <NavLink
+              className={({ isActive }) => `nav-link nav-link--feature${isActive ? " active" : ""}`}
+              to="/layout-studio"
+            >
+              <span className="nav-feature-dot" aria-hidden="true" />
+              <span>Layout Studio</span>
+              <span className="nav-feature-badge">Interactive</span>
             </NavLink>
           </div>
           <NavLink className={({ isActive }) => `nav-cta${isActive ? " active" : ""}`} to="/contact">

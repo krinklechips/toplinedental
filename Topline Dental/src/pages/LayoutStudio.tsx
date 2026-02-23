@@ -759,6 +759,11 @@ export default function LayoutStudio() {
     return "No selection";
   }, [selectedId, selectedZoneId]);
 
+  const roomZoneCount = zones.length;
+  const equipmentCount = items.length;
+  const operatoryZoneCount = zones.filter((zone) => zone.type === "operatory-room").length;
+  const showCanvasEmptyState = roomZoneCount === 0 && equipmentCount === 0;
+
   return (
     <section className="section layout-studio-section">
       <div className="layout-studio-shell">
@@ -769,6 +774,32 @@ export default function LayoutStudio() {
           onExportJson={exportJson}
           onEmailSales={emailSales}
         />
+
+        <div className="layout-studio-intro">
+          <div className="layout-studio-intro-copy">
+            <p className="eyebrow">Professional Planning Workspace</p>
+            <h3>Build room zones first, then place equipment with collision-safe layouting.</h3>
+            <p>
+              Use the zoning presets to define treatment, sterilization, imaging and support areas.
+              The studio will auto-snap to grid, prevent equipment overlap, and export a clean draft
+              for review with sales.
+            </p>
+          </div>
+          <div className="layout-studio-stats" aria-label="Layout studio summary">
+            <div className="layout-studio-stat">
+              <span className="layout-studio-stat-label">Room Zones</span>
+              <strong>{roomZoneCount}</strong>
+            </div>
+            <div className="layout-studio-stat">
+              <span className="layout-studio-stat-label">Equipment Items</span>
+              <strong>{equipmentCount}</strong>
+            </div>
+            <div className="layout-studio-stat">
+              <span className="layout-studio-stat-label">Operatories</span>
+              <strong>{operatoryZoneCount}</strong>
+            </div>
+          </div>
+        </div>
 
         <div className="layout-studio-workspace">
           <div className="layout-sidebar-stack">
@@ -819,6 +850,19 @@ export default function LayoutStudio() {
             onDrop={onCanvasDrop}
             onDragOver={(event) => event.preventDefault()}
           >
+            <div className="layout-stage-header">
+              <div>
+                <p className="layout-stage-title">Clinic Floor Plan</p>
+                <p className="layout-stage-subtitle">
+                  Room boundary + snap grid with zone-first planning and equipment placement
+                </p>
+              </div>
+              <div className="layout-stage-legend" aria-label="Canvas legend">
+                <span><i className="layout-stage-legend-dot zones" /> Zones</span>
+                <span><i className="layout-stage-legend-dot items" /> Equipment</span>
+              </div>
+            </div>
+
             <div className="layout-stage-controls" aria-label="Canvas zoom controls">
               <button
                 type="button"
@@ -845,6 +889,17 @@ export default function LayoutStudio() {
                 Fit
               </button>
             </div>
+
+            {showCanvasEmptyState && (
+              <div className="layout-stage-empty-state" aria-live="polite">
+                <p className="layout-stage-empty-eyebrow">Start Here</p>
+                <h4>Create your clinic zoning</h4>
+                <p>
+                  Add an operatory or reception zone from the left panel, then place chairs, cabinets,
+                  imaging, and sterilization systems inside the layout.
+                </p>
+              </div>
+            )}
 
             <Stage
               width={stageSize.width}
