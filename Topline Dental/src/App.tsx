@@ -2,7 +2,9 @@ import { Routes, Route } from "react-router-dom";
 import SiteLayout from "./components/SiteLayout";
 import Home from "./pages/Home";
 import Products from "./pages/Products";
+import ProductCategory from "./pages/ProductCategory";
 import Materials from "./pages/Materials";
+import MaterialCategory from "./pages/MaterialCategory";
 import Process from "./pages/Process";
 import Company from "./pages/Company";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
@@ -20,7 +22,9 @@ export default function App() {
       <Route element={<SiteLayout />}>
         <Route index element={<Home />} />
         <Route path="products" element={<Products />} />
+        <Route path="products/:categoryId" element={<ProductCategory />} />
         <Route path="materials" element={<Materials />} />
+        <Route path="materials/:categoryId" element={<MaterialCategory />} />
         <Route path="process" element={<Process />} />
         <Route path="layout-studio" element={<LayoutStudio />} />
         <Route path="layout" element={<LayoutStudio />} />

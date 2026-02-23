@@ -23,11 +23,11 @@ const groups = [
     title: "Catalogues",
     links: [
       { to: "/products", label: "Products (Equipment)" },
-      { to: "/products#operatories", label: "Dental Chairs & Units" },
-      { to: "/products#imaging", label: "Imaging Systems" },
-      { to: "/products#sterilization", label: "Sterilization Systems" },
-      { to: "/products#water-filtration", label: "Water Filtration" },
-      { to: "/products#small-equipment", label: "Handpieces & Small Equipment" },
+      { to: "/products/operatories", label: "Dental Chairs & Units" },
+      { to: "/products/imaging", label: "Imaging Systems" },
+      { to: "/products/sterilization", label: "Sterilization Systems" },
+      { to: "/products/water-filtration", label: "Water Filtration" },
+      { to: "/products/small-equipment", label: "Handpieces & Small Equipment" },
       { to: "/materials", label: "Materials & Consumables" }
     ]
   },

@@ -1,113 +1,64 @@
-import CatalogBrowseSection from "../components/CatalogBrowseSection";
+import { Link } from "react-router-dom";
 import { equipmentBrandLineup, equipmentCatalogSections, productHighlights } from "../data/siteContent";
 
 export default function Products() {
-  const productSidebarGroups = [
-    {
-      title: "Product Categories",
-      items: [
-        "Dental Chairs & Units",
-        "Imaging Systems",
-        "Sterilization Systems",
-        "Utility Support (Water / Air / Suction)",
-        "Handpieces & Small Equipment"
-      ]
-    },
-    {
-      title: "Manufacturer Focus",
-      items: ["A-dec", "Planmeca", "Carestream", "W&H", "Euronda", "NSK", "Cattani / MGF"]
-    },
-    {
-      title: "Project Type",
-      items: [
-        "New clinic setup",
-        "Operatory expansion",
-        "Replacement / upgrade",
-        "Sterilization room planning",
-        "Utility and support systems"
-      ]
-    }
-  ] as const;
-
-  const productBrowseTiles = equipmentCatalogSections.map((section) => ({
-    title: section.title,
-    subtitle: section.eyebrow,
-    description: section.description,
-    href: `#${section.id}`
-  }));
-
-  const productRailCards = [
-    {
-      tag: "How To Buy",
-      title: "No online checkout yet, but structured purchasing support is available.",
-      body:
-        "Send a quote request with your room count, priorities, and timeline. We will shortlist suitable systems, confirm availability, and propose options by budget tier.",
-      ctaLabel: "Request a Quote",
-      ctaHref: "/contact"
-    },
-    {
-      tag: "Featured Program",
-      title: "Sterilization workflow review",
-      body:
-        "Share your current instrument volume and room layout. We can propose autoclave capacity, zoning, and reprocessing support systems for better turnover.",
-      ctaLabel: "Discuss Sterilization Setup",
-      ctaHref: "/contact"
-    },
-    {
-      tag: "Planning Support",
-      title: "Clinic startup and phased upgrades",
-      body:
-        "If you are building in phases, we can prioritize essential systems first and stage later upgrades around utilization and budget."
-    }
-  ] as const;
-
   return (
     <section className="section">
       <div className="section-heading">
         <p className="eyebrow">Equipment Systems</p>
-        <h2>Capital equipment and clinic infrastructure for treatment, diagnostics, and reprocessing.</h2>
+        <h2>Equipment category hub with dedicated pages for each clinical system.</h2>
         <p className="section-subtitle">
-          This page is focused on equipment systems and clinic infrastructure. Consumables and
-          replenishment items are organized separately in the Materials catalogue.
+          Start here to browse equipment categories. Each category has its own page with planning
+          notes, project scenarios, and enquiry checklists so the content is not duplicated across
+          the catalogue.
         </p>
       </div>
 
-      <CatalogBrowseSection
-        eyebrow="Browse Equipment"
-        title="Browse equipment categories the way a distributor portal is organized."
-        summary="This section is built to feel like a distributor catalogue page: browse by category, manufacturer focus, and project type, then request pricing and availability through our team."
-        noticeTitle="Important Notice"
-        noticeBody="Topline Dental Concept is currently a quote-based catalogue and procurement site (not an online checkout store). Availability, lead times, and pricing are confirmed through direct enquiry."
-        sidebarGroups={productSidebarGroups}
-        tiles={productBrowseTiles}
-        railCards={productRailCards}
-      />
-
       <div className="section-copy">
-        <p className="eyebrow">Equipment Catalogue</p>
-        <h3>Browse by clinical workflow zone and equipment type.</h3>
+        <p className="eyebrow">Category Pages</p>
+        <h3>Open a dedicated page for the system you are evaluating.</h3>
         <p>
-          Use the sections below to review treatment-room equipment, diagnostics, sterilization,
-          utility support, and high-use chairside equipment categories. Each section is structured
-          around practical deployment and uptime considerations.
+          These category pages are designed for quote-based procurement support, not online
+          checkout. Use them to review category-specific considerations before contacting us.
         </p>
         <div className="pill-row catalog-quick-links">
           {equipmentCatalogSections.map((section) => (
-            <a key={section.id} className="pill" href={`#${section.id}`}>
+            <Link key={section.id} className="pill" to={`/products/${section.id}`}>
               {section.title}
-            </a>
+            </Link>
           ))}
         </div>
       </div>
 
       <section className="catalog-section">
+        <div className="grid-3">
+          {equipmentCatalogSections.map((section) => (
+            <article key={section.id} className="card catalog-category-card">
+              <p className="card-tag">{section.eyebrow}</p>
+              <h3>{section.title}</h3>
+              <p>{section.description}</p>
+              <div className="pill-row">
+                {section.brands.slice(0, 3).map((brand) => (
+                  <span key={`${section.id}-${brand}`} className="pill">
+                    {brand}
+                  </span>
+                ))}
+              </div>
+              <Link className="catalog-category-link" to={`/products/${section.id}`}>
+                View category page →
+              </Link>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="catalog-section">
         <div className="section-copy">
-          <p className="eyebrow">Topline Dental Concept Sdn Bhd</p>
-          <h3>Representative equipment categories and supplied lines.</h3>
+          <p className="eyebrow">Representative Brands</p>
+          <h3>Examples of lines we supply across major equipment categories.</h3>
           <p>
-            Sample lineup across operatories, imaging, sterilization, handpieces, utilities, and
-            furniture. Availability and exact models may vary by project scope, lead time, and
-            supplier allocation.
+            The lineup below is a representative overview. Final recommendations depend on workflow
+            needs, room planning, lead times, and project budget.
           </p>
         </div>
 
@@ -126,66 +77,37 @@ export default function Products() {
         </div>
       </section>
 
-      {equipmentCatalogSections.map((section) => (
-        <section key={section.id} id={section.id} className="catalog-section page-anchor">
-          <div className="catalog-section-head">
-            <div className="section-copy">
-              <p className="eyebrow">{section.eyebrow}</p>
-              <h3>{section.title}</h3>
-              <p>{section.description}</p>
-              <div className="pill-row">
-                {section.brands.map((brand) => (
-                  <span key={brand} className="pill">
-                    {brand}
-                  </span>
-                ))}
-              </div>
-            </div>
+      <section className="catalog-section">
+        <div className="section-copy">
+          <p className="eyebrow">Featured Reprocessing Systems</p>
+          <h3>Examples often reviewed during sterilization workflow projects.</h3>
+          <p>
+            These featured products support sterilization room planning discussions. Use the
+            dedicated Sterilization Systems category page for broader planning guidance.
+          </p>
+          <div className="pill-row">
+            <Link className="pill" to="/products/sterilization">
+              Open Sterilization Systems page
+            </Link>
           </div>
+        </div>
 
-          <div className="grid-3">
-            {section.highlights.map((item) => (
-              <article key={item.title} className="card">
-                <p className="card-tag">{section.eyebrow}</p>
-                <h3>{item.title}</h3>
-                <p>{item.detail}</p>
-              </article>
-            ))}
-          </div>
-
-          {section.id === "sterilization" && (
-            <div className="catalog-feature-block">
-              <div className="section-copy">
-                <p className="eyebrow">Featured Euronda Systems</p>
-                <h3>Reprocessing systems commonly specified for sterilization workflows.</h3>
-                <p>
-                  Featured models below are shown as examples for sterilization room planning,
-                  reprocessing throughput, and equipment protection discussions.
-                </p>
+        <div className="grid-3">
+          {productHighlights.map((product) => (
+            <article key={product.title} id={product.id} className="product-card page-anchor">
+              <div className="product-image">
+                <img src={product.image} alt={product.alt} loading="lazy" />
               </div>
-              <div className="grid-3">
-                {productHighlights.map((product) => (
-                  <article
-                    key={product.title}
-                    id={product.id}
-                    className="product-card page-anchor"
-                  >
-                    <div className="product-image">
-                      <img src={product.image} alt={product.alt} loading="lazy" />
-                    </div>
-                    <div className="product-header">
-                      <span className="product-icon" />
-                      <span className="product-label">Euronda</span>
-                    </div>
-                    <h3>{product.title}</h3>
-                    <p>{product.detail}</p>
-                  </article>
-                ))}
+              <div className="product-header">
+                <span className="product-icon" />
+                <span className="product-label">Euronda</span>
               </div>
-            </div>
-          )}
-        </section>
-      ))}
+              <h3>{product.title}</h3>
+              <p>{product.detail}</p>
+            </article>
+          ))}
+        </div>
+      </section>
     </section>
   );
 }
