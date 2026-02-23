@@ -116,20 +116,121 @@ export default function Contact() {
                 className="hidden"
               />
 
-              <div className="contact-form-layout">
-                <div className="contact-form-main">
+              <div className="contact-form-clean">
+                <div className="form-field">
+                  <label htmlFor="enquiryType">Enquiry Type</label>
+                  <select
+                    id="enquiryType"
+                    name="enquiryType"
+                    value={form.enquiryType}
+                    onChange={handleChange}
+                    required
+                    className="form-input"
+                  >
+                    <option value="">Select an option</option>
+                    {enquiryOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="form-grid">
                   <div className="form-field">
-                    <label htmlFor="enquiryType">Enquiry Type</label>
-                    <select
-                      id="enquiryType"
-                      name="enquiryType"
-                      value={form.enquiryType}
+                    <label htmlFor="name">Name</label>
+                    <input
+                      id="name"
+                      type="text"
+                      name="name"
+                      value={form.name}
                       onChange={handleChange}
                       required
+                      placeholder="Your full name"
+                      className="form-input"
+                    />
+                  </div>
+                  <div className="form-field">
+                    <label htmlFor="email">Email</label>
+                    <input
+                      id="email"
+                      type="email"
+                      name="email"
+                      value={form.email}
+                      onChange={handleChange}
+                      required
+                      placeholder="you@clinic.com"
+                      className="form-input"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-grid">
+                  <div className="form-field">
+                    <label htmlFor="phone">Phone</label>
+                    <input
+                      id="phone"
+                      type="tel"
+                      name="phone"
+                      value={form.phone}
+                      onChange={handleChange}
+                      placeholder="+60 12-345 6789"
+                      className="form-input"
+                    />
+                  </div>
+                  <div className="form-field">
+                    <label htmlFor="companyName">Clinic / Company</label>
+                    <input
+                      id="companyName"
+                      type="text"
+                      name="companyName"
+                      value={form.companyName}
+                      onChange={handleChange}
+                      placeholder="Topline Dental Clinic"
+                      className="form-input"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-grid">
+                  <div className="form-field">
+                    <label htmlFor="location">Clinic Location</label>
+                    <input
+                      id="location"
+                      type="text"
+                      name="location"
+                      value={form.location}
+                      onChange={handleChange}
+                      placeholder="City, State"
+                      className="form-input"
+                    />
+                  </div>
+                  <div className="form-field">
+                    <label htmlFor="role">Role / Title</label>
+                    <input
+                      id="role"
+                      type="text"
+                      name="role"
+                      value={form.role}
+                      onChange={handleChange}
+                      placeholder="Owner, Dentist, Practice Manager"
+                      className="form-input"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-grid form-grid--quad">
+                  <div className="form-field">
+                    <label htmlFor="clinicSize">Clinic Size</label>
+                    <select
+                      id="clinicSize"
+                      name="clinicSize"
+                      value={form.clinicSize}
+                      onChange={handleChange}
                       className="form-input"
                     >
-                      <option value="">Select an option</option>
-                      {enquiryOptions.map((option) => (
+                      <option value="">Select size</option>
+                      {clinicSizeOptions.map((option) => (
                         <option key={option} value={option}>
                           {option}
                         </option>
@@ -137,200 +238,103 @@ export default function Contact() {
                     </select>
                   </div>
 
-                  <div className="form-grid">
-                    <div className="form-field">
-                      <label htmlFor="name">Name</label>
-                      <input
-                        id="name"
-                        type="text"
-                        name="name"
-                        value={form.name}
-                        onChange={handleChange}
-                        required
-                        placeholder="Your full name"
-                        className="form-input"
-                      />
-                    </div>
-                    <div className="form-field">
-                      <label htmlFor="email">Email</label>
-                      <input
-                        id="email"
-                        type="email"
-                        name="email"
-                        value={form.email}
-                        onChange={handleChange}
-                        required
-                        placeholder="you@clinic.com"
-                        className="form-input"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="form-grid">
-                    <div className="form-field">
-                      <label htmlFor="phone">Phone</label>
-                      <input
-                        id="phone"
-                        type="tel"
-                        name="phone"
-                        value={form.phone}
-                        onChange={handleChange}
-                        placeholder="+60 12-345 6789"
-                        className="form-input"
-                      />
-                    </div>
-                    <div className="form-field">
-                      <label htmlFor="companyName">Clinic / Company</label>
-                      <input
-                        id="companyName"
-                        type="text"
-                        name="companyName"
-                        value={form.companyName}
-                        onChange={handleChange}
-                        placeholder="Topline Dental Clinic"
-                        className="form-input"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="form-grid">
-                    <div className="form-field">
-                      <label htmlFor="location">Clinic Location</label>
-                      <input
-                        id="location"
-                        type="text"
-                        name="location"
-                        value={form.location}
-                        onChange={handleChange}
-                        placeholder="City, State"
-                        className="form-input"
-                      />
-                    </div>
-                    <div className="form-field">
-                      <label htmlFor="role">Role / Title</label>
-                      <input
-                        id="role"
-                        type="text"
-                        name="role"
-                        value={form.role}
-                        onChange={handleChange}
-                        placeholder="Owner, Dentist, Practice Manager"
-                        className="form-input"
-                      />
-                    </div>
+                  <div className="form-field">
+                    <label htmlFor="budget">Budget Range</label>
+                    <select
+                      id="budget"
+                      name="budget"
+                      value={form.budget}
+                      onChange={handleChange}
+                      className="form-input"
+                    >
+                      <option value="">Select budget</option>
+                      {budgetOptions.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
                   <div className="form-field">
-                    <label htmlFor="message">Message</label>
-                    <textarea
-                      id="message"
-                      name="message"
-                      value={form.message}
+                    <label htmlFor="timeline">Timeline</label>
+                    <select
+                      id="timeline"
+                      name="timeline"
+                      value={form.timeline}
                       onChange={handleChange}
-                      required
-                      rows={5}
-                      placeholder="Share your equipment needs, current setup, or any special requirements."
-                      className="form-input form-textarea"
-                    />
+                      className="form-input"
+                    >
+                      <option value="">Select timeline</option>
+                      {timelineOptions.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="form-field">
+                    <label htmlFor="preferredContact">Preferred Contact</label>
+                    <select
+                      id="preferredContact"
+                      name="preferredContact"
+                      value={form.preferredContact}
+                      onChange={handleChange}
+                      className="form-input"
+                    >
+                      <option value="">Select method</option>
+                      {contactMethodOptions.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
 
-                <aside className="contact-form-side">
-                  <div className="form-grid form-grid--tight">
-                    <div className="form-field">
-                      <label htmlFor="clinicSize">Clinic Size</label>
-                      <select
-                        id="clinicSize"
-                        name="clinicSize"
-                        value={form.clinicSize}
-                        onChange={handleChange}
-                        className="form-input"
-                      >
-                        <option value="">Select size</option>
-                        {clinicSizeOptions.map((option) => (
-                          <option key={option} value={option}>
-                            {option}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className="form-field">
-                      <label htmlFor="budget">Budget Range</label>
-                      <select
-                        id="budget"
-                        name="budget"
-                        value={form.budget}
-                        onChange={handleChange}
-                        className="form-input"
-                      >
-                        <option value="">Select budget</option>
-                        {budgetOptions.map((option) => (
-                          <option key={option} value={option}>
-                            {option}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className="form-field">
-                      <label htmlFor="timeline">Timeline</label>
-                      <select
-                        id="timeline"
-                        name="timeline"
-                        value={form.timeline}
-                        onChange={handleChange}
-                        className="form-input"
-                      >
-                        <option value="">Select timeline</option>
-                        {timelineOptions.map((option) => (
-                          <option key={option} value={option}>
-                            {option}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className="form-field">
-                      <label htmlFor="preferredContact">Preferred Contact</label>
-                      <select
-                        id="preferredContact"
-                        name="preferredContact"
-                        value={form.preferredContact}
-                        onChange={handleChange}
-                        className="form-input"
-                      >
-                        <option value="">Select method</option>
-                        {contactMethodOptions.map((option) => (
-                          <option key={option} value={option}>
-                            {option}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                <div className="form-field">
+                  <div className="contact-focus-head">
+                    <label>Equipment / Materials Focus</label>
+                    <p className="form-helper">Select any that apply.</p>
                   </div>
-
-                  <div className="form-field">
-                    <label>Equipment Focus</label>
-                    <div className="checkbox-grid checkbox-grid--compact">
-                      {equipmentFocusOptions.map((option) => (
-                        <label key={option} className="checkbox-item">
-                          <input
-                            type="checkbox"
-                            checked={form.equipmentFocus.includes(option)}
-                            onChange={() => handleEquipmentToggle(option)}
-                          />
+                  <div className="contact-focus-grid" role="group" aria-label="Equipment or materials focus">
+                    {equipmentFocusOptions.map((option) => {
+                      const isSelected = form.equipmentFocus.includes(option);
+                      return (
+                        <button
+                          key={option}
+                          type="button"
+                          className={`contact-focus-chip${isSelected ? " active" : ""}`}
+                          aria-pressed={isSelected}
+                          onClick={() => handleEquipmentToggle(option)}
+                        >
+                          <span className="contact-focus-chip-dot" aria-hidden="true" />
                           <span>{option}</span>
-                        </label>
-                      ))}
-                    </div>
+                        </button>
+                      );
+                    })}
                   </div>
+                </div>
 
-                  <p className="form-helper contact-form-helper">
-                    Include only what you know now. We can refine the specification during the
-                    first consultation.
-                  </p>
-                </aside>
+                <div className="form-field">
+                  <label htmlFor="message">Message</label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    value={form.message}
+                    onChange={handleChange}
+                    required
+                    rows={5}
+                    placeholder="Share your equipment needs, current setup, or any special requirements."
+                    className="form-input form-textarea"
+                  />
+                </div>
+
+                <p className="form-helper contact-form-helper">
+                  Include only what you know now. We can refine the specification during the first
+                  consultation.
+                </p>
               </div>
 
               <div className="form-actions">

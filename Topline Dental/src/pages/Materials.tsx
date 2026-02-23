@@ -1,4 +1,4 @@
-import { materialLineup } from "../data/siteContent";
+import { consumableBrandLineup, materialLineup } from "../data/siteContent";
 
 export default function Materials() {
   return (
@@ -29,6 +29,31 @@ export default function Materials() {
           <span className="pill">Disposables</span>
         </div>
       </div>
+
+      <section className="catalog-section">
+        <div className="section-copy">
+          <p className="eyebrow">Stocked Consumable Brands</p>
+          <h3>Examples of consumable lines we currently supply.</h3>
+          <p>
+            This is separate from equipment systems and reflects consumable-focused items such as
+            disposables and needles.
+          </p>
+        </div>
+
+        <div className="grid-3">
+          {consumableBrandLineup.map((group) => (
+            <article key={group.category} className="card brand-portfolio-card">
+              <p className="card-tag">Consumables</p>
+              <h3>{group.category}</h3>
+              <ul className="brand-portfolio-list">
+                {group.items.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </article>
+          ))}
+        </div>
+      </section>
 
       <div className="grid-3">
         {materialLineup.map((material) => (

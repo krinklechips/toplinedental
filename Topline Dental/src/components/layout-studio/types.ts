@@ -131,37 +131,37 @@ export const LAYOUT_ZONE_DEFINITIONS: LayoutZoneDefinition[] = [
   {
     type: "operatory-room",
     label: "Operatory Room",
-    color: "#2f6fe6",
+    color: "#2f6fff",
     defaultSize: { width: 240, height: 180 }
   },
   {
     type: "imaging-room",
     label: "Imaging Room",
-    color: "#0e7490",
+    color: "#0ea5a6",
     defaultSize: { width: 200, height: 160 }
   },
   {
     type: "sterilization-room",
     label: "Sterilization",
-    color: "#047857",
+    color: "#10b981",
     defaultSize: { width: 220, height: 160 }
   },
   {
     type: "consult-room",
     label: "Consult Room",
-    color: "#7c3aed",
+    color: "#8b5cf6",
     defaultSize: { width: 180, height: 140 }
   },
   {
     type: "reception-zone",
     label: "Reception",
-    color: "#b45309",
+    color: "#f59e0b",
     defaultSize: { width: 240, height: 140 }
   },
   {
     type: "storage-zone",
     label: "Storage / Utility",
-    color: "#475569",
+    color: "#64748b",
     defaultSize: { width: 180, height: 120 }
   }
 ];

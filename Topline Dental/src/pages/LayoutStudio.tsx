@@ -40,6 +40,92 @@ const overlaps = (
   b: { left: number; right: number; top: number; bottom: number }
 ) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
 
+const hexToRgba = (hex: string, alpha: number) => {
+  const normalized = hex.replace("#", "");
+  const expanded =
+    normalized.length === 3
+      ? normalized
+          .split("")
+          .map((char) => `${char}${char}`)
+          .join("")
+      : normalized;
+
+  const r = Number.parseInt(expanded.slice(0, 2), 16);
+  const g = Number.parseInt(expanded.slice(2, 4), 16);
+  const b = Number.parseInt(expanded.slice(4, 6), 16);
+
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
+const ITEM_TONES: Record<
+  LayoutItemType,
+  { stroke: string; surface: string; border: string; shadow: string; badge: string }
+> = {
+  "dental-chair": {
+    stroke: "#2563eb",
+    surface: "#f7fbff",
+    border: "#bfdbfe",
+    shadow: hexToRgba("#2563eb", 0.12),
+    badge: "#dbeafe"
+  },
+  "dentist-stool": {
+    stroke: "#0ea5a6",
+    surface: "#f2fffe",
+    border: "#a5f3fc",
+    shadow: hexToRgba("#0ea5a6", 0.11),
+    badge: "#ccfbf1"
+  },
+  "assistant-stool": {
+    stroke: "#14b8a6",
+    surface: "#f1fffc",
+    border: "#99f6e4",
+    shadow: hexToRgba("#14b8a6", 0.1),
+    badge: "#ccfbf1"
+  },
+  cabinet: {
+    stroke: "#475569",
+    surface: "#f8fafc",
+    border: "#cbd5e1",
+    shadow: hexToRgba("#475569", 0.1),
+    badge: "#e2e8f0"
+  },
+  sink: {
+    stroke: "#0891b2",
+    surface: "#f2fbff",
+    border: "#bae6fd",
+    shadow: hexToRgba("#0891b2", 0.1),
+    badge: "#dbeafe"
+  },
+  sterilizer: {
+    stroke: "#10b981",
+    surface: "#f3fff9",
+    border: "#a7f3d0",
+    shadow: hexToRgba("#10b981", 0.1),
+    badge: "#d1fae5"
+  },
+  "xray-imaging": {
+    stroke: "#7c3aed",
+    surface: "#fbf8ff",
+    border: "#ddd6fe",
+    shadow: hexToRgba("#7c3aed", 0.11),
+    badge: "#ede9fe"
+  },
+  "pc-workstation": {
+    stroke: "#0f766e",
+    surface: "#f1fffb",
+    border: "#99f6e4",
+    shadow: hexToRgba("#0f766e", 0.1),
+    badge: "#ccfbf1"
+  },
+  "reception-desk": {
+    stroke: "#f59e0b",
+    surface: "#fffaf0",
+    border: "#fde68a",
+    shadow: hexToRgba("#f59e0b", 0.12),
+    badge: "#fef3c7"
+  }
+};
+
 const createItemId = () =>
   typeof crypto !== "undefined" && "randomUUID" in crypto
     ? crypto.randomUUID()
@@ -121,8 +207,7 @@ const restoreLayoutState = (): LayoutStudioState => {
   }
 };
 
-function CanvasGlyph({ type }: { type: LayoutItemType }) {
-  const stroke = "#1b5bd6";
+function CanvasGlyph({ type, stroke = "#1b5bd6" }: { type: LayoutItemType; stroke?: string }) {
   const commonStroke = {
     stroke,
     strokeWidth: 1.7,
@@ -844,72 +929,79 @@ export default function LayoutStudio() {
             </aside>
           </div>
 
-          <div
-            className="layout-stage-shell"
-            ref={canvasWrapRef}
-            onDrop={onCanvasDrop}
-            onDragOver={(event) => event.preventDefault()}
-          >
-            <div className="layout-stage-header">
-              <div>
-                <p className="layout-stage-title">Clinic Floor Plan</p>
-                <p className="layout-stage-subtitle">
-                  Room boundary + snap grid with zone-first planning and equipment placement
-                </p>
+          <div className="layout-stage-panel">
+            <div className="layout-stage-topbar">
+              <div className="layout-stage-header">
+                <div>
+                  <p className="layout-stage-title">Clinic Floor Plan</p>
+                  <p className="layout-stage-subtitle">
+                    Room boundary + snap grid with zone-first planning and equipment placement
+                  </p>
+                </div>
+                <div className="layout-stage-legend" aria-label="Canvas legend">
+                  <span className="zones"><i className="layout-stage-legend-dot zones" /> Zones</span>
+                  <span className="items"><i className="layout-stage-legend-dot items" /> Equipment</span>
+                </div>
               </div>
-              <div className="layout-stage-legend" aria-label="Canvas legend">
-                <span><i className="layout-stage-legend-dot zones" /> Zones</span>
-                <span><i className="layout-stage-legend-dot items" /> Equipment</span>
+
+              <div className="layout-stage-controls" aria-label="Canvas zoom controls">
+                <button
+                  type="button"
+                  className="layout-stage-control"
+                  onClick={() =>
+                    setZoom((previous) => clamp(Number((previous - 0.1).toFixed(2)), 0.5, 1.4))
+                  }
+                  aria-label="Zoom out"
+                >
+                  -
+                </button>
+                <span className="layout-stage-zoom-label">{Math.round(zoom * 100)}%</span>
+                <button
+                  type="button"
+                  className="layout-stage-control"
+                  onClick={() =>
+                    setZoom((previous) => clamp(Number((previous + 0.1).toFixed(2)), 0.5, 1.4))
+                  }
+                  aria-label="Zoom in"
+                >
+                  +
+                </button>
+                <button
+                  type="button"
+                  className="layout-stage-control layout-stage-control--fit"
+                  onClick={() => setZoom(1)}
+                >
+                  Fit
+                </button>
               </div>
             </div>
 
-            <div className="layout-stage-controls" aria-label="Canvas zoom controls">
-              <button
-                type="button"
-                className="layout-stage-control"
-                onClick={() => setZoom((previous) => clamp(Number((previous - 0.1).toFixed(2)), 0.5, 1.4))}
-                aria-label="Zoom out"
-              >
-                -
-              </button>
-              <span className="layout-stage-zoom-label">{Math.round(zoom * 100)}%</span>
-              <button
-                type="button"
-                className="layout-stage-control"
-                onClick={() => setZoom((previous) => clamp(Number((previous + 0.1).toFixed(2)), 0.5, 1.4))}
-                aria-label="Zoom in"
-              >
-                +
-              </button>
-              <button
-                type="button"
-                className="layout-stage-control layout-stage-control--fit"
-                onClick={() => setZoom(1)}
-              >
-                Fit
-              </button>
-            </div>
-
-            {showCanvasEmptyState && (
-              <div className="layout-stage-empty-state" aria-live="polite">
-                <p className="layout-stage-empty-eyebrow">Start Here</p>
-                <h4>Create your clinic zoning</h4>
-                <p>
-                  Add an operatory or reception zone from the left panel, then place chairs, cabinets,
-                  imaging, and sterilization systems inside the layout.
-                </p>
-              </div>
-            )}
-
-            <Stage
-              width={stageSize.width}
-              height={stageSize.height}
-              ref={stageRef}
-              onMouseDown={onStagePointerDown}
-              onTouchStart={onStagePointerDown}
+            <div
+              className="layout-stage-shell"
+              ref={canvasWrapRef}
+              onDrop={onCanvasDrop}
+              onDragOver={(event) => event.preventDefault()}
             >
+              {showCanvasEmptyState && (
+                <div className="layout-stage-empty-state" aria-live="polite">
+                  <p className="layout-stage-empty-eyebrow">Start Here</p>
+                  <h4>Create your clinic zoning</h4>
+                  <p>
+                    Add an operatory or reception zone from the left panel, then place chairs,
+                    cabinets, imaging, and sterilization systems inside the layout.
+                  </p>
+                </div>
+              )}
+
+              <Stage
+                width={stageSize.width}
+                height={stageSize.height}
+                ref={stageRef}
+                onMouseDown={onStagePointerDown}
+                onTouchStart={onStagePointerDown}
+              >
               <Layer>
-                <Rect x={0} y={0} width={stageSize.width} height={stageSize.height} fill="#f9fbff" />
+                <Rect x={0} y={0} width={stageSize.width} height={stageSize.height} fill="#f4f7fc" />
                 <Group x={contentOffset.x} y={contentOffset.y} scaleX={zoom} scaleY={zoom}>
                 <Rect
                   x={roomRect.x}
@@ -917,8 +1009,8 @@ export default function LayoutStudio() {
                   width={roomRect.width}
                   height={roomRect.height}
                   cornerRadius={18}
-                  fill="#ffffff"
-                  stroke="rgba(15, 23, 42, 0.16)"
+                  fill="#fbfdff"
+                  stroke="rgba(148, 163, 184, 0.45)"
                   strokeWidth={1.2}
                   name="room-surface"
                 />
@@ -927,7 +1019,7 @@ export default function LayoutStudio() {
                   <Line
                     key={line.key}
                     points={line.points}
-                    stroke="rgba(15, 23, 42, 0.06)"
+                    stroke="rgba(37, 99, 235, 0.07)"
                     strokeWidth={1}
                     listening={false}
                   />
@@ -936,6 +1028,10 @@ export default function LayoutStudio() {
                 {zones.map((zone) => {
                   const isSelected = selectedZoneId === zone.id;
                   const isDraggingZone = draggingZoneId === zone.id;
+                  const zoneFill = hexToRgba(zone.color, isSelected ? 0.16 : 0.09);
+                  const zoneStroke = hexToRgba(zone.color, isSelected ? 0.9 : 0.48);
+                  const zoneChipBg = hexToRgba(zone.color, 0.12);
+                  const zoneChipBorder = hexToRgba(zone.color, 0.24);
 
                   return (
                     <Group
@@ -999,22 +1095,34 @@ export default function LayoutStudio() {
                         width={zone.width}
                         height={zone.height}
                         cornerRadius={12}
-                        fill={`${zone.color}12`}
-                        stroke={`${zone.color}${isSelected ? "cc" : "66"}`}
+                        fill={zoneFill}
+                        stroke={zoneStroke}
                         strokeWidth={isSelected ? 2 : 1.2}
-                        dash={isSelected ? [10, 6] : [6, 5]}
+                        dash={isSelected ? [10, 6] : [7, 6]}
                         shadowColor="#0f172a"
                         shadowBlur={isDraggingZone ? 14 : 0}
                         shadowOpacity={isDraggingZone ? 0.08 : 0}
                         shadowOffsetY={isDraggingZone ? 4 : 0}
                       />
 
-                      <Text
+                      <Rect
                         x={10}
                         y={10}
-                        width={Math.max(80, zone.width - 20)}
+                        width={Math.min(zone.width - 20, 156)}
+                        height={26}
+                        cornerRadius={999}
+                        fill={zoneChipBg}
+                        stroke={zoneChipBorder}
+                        strokeWidth={1}
+                        listening={false}
+                      />
+
+                      <Text
+                        x={20}
+                        y={16}
+                        width={Math.max(80, Math.min(zone.width - 38, 142))}
                         text={zone.label}
-                        fontSize={12}
+                        fontSize={11}
                         fontStyle="bold"
                         fill={zone.color}
                         listening={false}
@@ -1074,7 +1182,7 @@ export default function LayoutStudio() {
                               height={12}
                               cornerRadius={4}
                               fill="#ffffff"
-                              stroke={zone.color}
+                              stroke={zoneStroke}
                               strokeWidth={1.2}
                             />
                           </Group>
@@ -1138,6 +1246,7 @@ export default function LayoutStudio() {
 
                 {items.map((item) => {
                   const definition = LAYOUT_ITEM_BY_TYPE[item.type];
+                  const tone = ITEM_TONES[item.type];
                   const { width, height } = getItemDimensions(item);
                   const isSelected = selectedId === item.id;
                   const isDragging = draggingId === item.id;
@@ -1218,13 +1327,23 @@ export default function LayoutStudio() {
                         width={width}
                         height={height}
                         cornerRadius={14}
-                        fill="#ffffff"
-                        stroke="rgba(15, 23, 42, 0.1)"
+                        fill={tone.surface}
+                        stroke={isSelected ? tone.stroke : tone.border}
                         strokeWidth={1}
-                        shadowColor="#0f172a"
+                        shadowColor={isSelected ? tone.shadow : "#0f172a"}
                         shadowBlur={isDragging ? 24 : 14}
-                        shadowOpacity={isDragging ? 0.2 : 0.1}
+                        shadowOpacity={isDragging ? 0.22 : isSelected ? 0.14 : 0.08}
                         shadowOffsetY={isDragging ? 10 : 6}
+                      />
+
+                      <Rect
+                        x={0}
+                        y={0}
+                        width={width}
+                        height={6}
+                        cornerRadius={[14, 14, 8, 8]}
+                        fill={tone.badge}
+                        listening={false}
                       />
 
                       {isSelected && (
@@ -1234,15 +1353,24 @@ export default function LayoutStudio() {
                           width={width + 8}
                           height={height + 8}
                           cornerRadius={16}
-                          stroke="#1b5bd6"
+                          stroke={tone.stroke}
                           strokeWidth={2}
                           dash={[8, 6]}
                         />
                       )}
 
                       <Group x={width / 2} y={Math.min(36, Math.max(28, height * 0.38))} listening={false}>
-                        <CanvasGlyph type={item.type} />
+                        <CanvasGlyph type={item.type} stroke={tone.stroke} />
                       </Group>
+
+                      <Circle
+                        x={14}
+                        y={14}
+                        radius={4}
+                        fill={tone.stroke}
+                        opacity={0.9}
+                        listening={false}
+                      />
 
                       <Text
                         y={Math.max(height - 24, 12)}
@@ -1250,7 +1378,7 @@ export default function LayoutStudio() {
                         align="center"
                         text={definition.label}
                         fontSize={12}
-                        fill="#415063"
+                        fill="#243447"
                         listening={false}
                       />
 
@@ -1293,7 +1421,7 @@ export default function LayoutStudio() {
                             height={12}
                             cornerRadius={4}
                             fill="#ffffff"
-                            stroke="#1b5bd6"
+                            stroke={tone.stroke}
                             strokeWidth={1.2}
                           />
                         </Group>
@@ -1369,7 +1497,8 @@ export default function LayoutStudio() {
                 })}
                 </Group>
               </Layer>
-            </Stage>
+              </Stage>
+            </div>
           </div>
         </div>
       </div>

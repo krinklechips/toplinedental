@@ -5,6 +5,10 @@ import Products from "./pages/Products";
 import Materials from "./pages/Materials";
 import Process from "./pages/Process";
 import Company from "./pages/Company";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import Terms from "./pages/Terms";
+import Governance from "./pages/Governance";
+import SiteMapPage from "./pages/SiteMap";
 import Contact from "./pages/Contact";
 import LayoutStudio from "./pages/LayoutStudio";
 import InteractiveDrafts from "./pages/InteractiveDrafts";
@@ -22,6 +26,10 @@ export default function App() {
         <Route path="layout" element={<LayoutStudio />} />
         <Route path="drafts" element={<InteractiveDrafts />} />
         <Route path="company" element={<Company />} />
+        <Route path="privacy" element={<PrivacyPolicy />} />
+        <Route path="terms" element={<Terms />} />
+        <Route path="governance" element={<Governance />} />
+        <Route path="sitemap" element={<SiteMapPage />} />
         <Route path="contact" element={<Contact />} />
         <Route path="*" element={<NotFound />} />
       </Route>
