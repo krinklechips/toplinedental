@@ -22,13 +22,14 @@ const groups = [
     id: "catalogues",
     title: "Catalogues",
     links: [
-      { to: "/products", label: "Products (Equipment)" },
-      { to: "/products/operatories", label: "Dental Chairs & Units" },
+      { to: "/products", label: "Products (Category Landing)" },
+      { to: "/products/chairs-units", label: "Dental Chairs & Units" },
       { to: "/products/imaging", label: "Imaging Systems" },
       { to: "/products/sterilization", label: "Sterilization Systems" },
       { to: "/products/water-filtration", label: "Water Filtration" },
-      { to: "/products/small-equipment", label: "Handpieces & Small Equipment" },
-      { to: "/materials", label: "Materials & Consumables" }
+      { to: "/products/handpieces-small-equipment", label: "Handpieces & Small Equipment" },
+      { to: "/products/materials-consumables", label: "Dental Materials & Consumables" },
+      { to: "/products/orthodontic-consumables", label: "Orthodontic Consumables" }
     ]
   },
   {

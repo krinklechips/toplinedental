@@ -26,19 +26,19 @@ export default function SiteLayout() {
         {
           label: "Equipment",
           links: [
-            { to: "/products/operatories", label: "Dental Chairs & Units" },
+            { to: "/products/chairs-units", label: "Dental Chairs & Units" },
             { to: "/products/imaging", label: "Imaging Systems" },
             { to: "/products/sterilization", label: "Sterilization Systems" },
             { to: "/products/water-filtration", label: "Water Filtration" },
-            { to: "/products/small-equipment", label: "Handpieces & Small Equipment" }
+            { to: "/products/handpieces-small-equipment", label: "Handpieces & Small Equipment" }
           ]
         },
         {
           label: "Materials",
           links: [
-            { to: "/materials", label: "Dental Materials & Consumables" },
-            { to: "/materials", label: "Orthodontic Consumables" },
-            { to: "/materials", label: "Infection Control Consumables" }
+            { to: "/products/materials-consumables", label: "Dental Materials & Consumables" },
+            { to: "/products/orthodontic-consumables", label: "Orthodontic Consumables" },
+            { to: "/products/materials-consumables", label: "Infection Control Consumables" }
           ]
         }
       ]
@@ -78,8 +78,8 @@ export default function SiteLayout() {
         {
           label: "Catalogues",
           links: [
-            { to: "/products", label: "Equipment Catalogue" },
-            { to: "/materials", label: "Materials Catalogue" }
+            { to: "/products", label: "Product Categories" },
+            { to: "/products/materials-consumables", label: "Materials & Consumables" }
           ]
         }
       ]
@@ -311,20 +311,20 @@ export default function SiteLayout() {
             <div className="mega-menu">
               <div className="mega-col">
                 <p className="mega-label">Equipment</p>
-                <Link to="/products/operatories">Dental Chairs &amp; Units</Link>
+                <Link to="/products/chairs-units">Dental Chairs &amp; Units</Link>
                 <Link to="/products/imaging">Imaging Systems</Link>
                 <Link to="/products/sterilization">Sterilization Systems</Link>
                 <Link to="/products/water-filtration">Water Filtration</Link>
-                <Link to="/products/small-equipment">Handpieces &amp; Small Equipment</Link>
+                <Link to="/products/handpieces-small-equipment">Handpieces &amp; Small Equipment</Link>
                 <p className="mega-label">Materials</p>
-                <Link to="/materials">Dental Materials &amp; Consumables</Link>
-                <Link to="/materials">Orthodontic Consumables</Link>
+                <Link to="/products/materials-consumables">Dental Materials &amp; Consumables</Link>
+                <Link to="/products/orthodontic-consumables">Orthodontic Consumables</Link>
               </div>
               <div className="mega-col">
                 <p className="mega-label">Euronda Line</p>
-                <Link to="/products/sterilization#euronda-e8">E8 Autoclave</Link>
-                <Link to="/products/sterilization#euronda-aquafilter">Aquafilter 1 to 1</Link>
-                <Link to="/products/sterilization#euronda-thermodisinfectors">Thermodisinfectors</Link>
+                <Link to="/products/sterilization">E8 Autoclave</Link>
+                <Link to="/products/sterilization">Aquafilter 1 to 1</Link>
+                <Link to="/products/sterilization">Thermodisinfectors</Link>
               </div>
               <div className="mega-col">
                 <p className="mega-label">Services</p>

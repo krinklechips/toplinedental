@@ -1,10 +1,8 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import SiteLayout from "./components/SiteLayout";
 import Home from "./pages/Home";
-import Products from "./pages/Products";
-import ProductCategory from "./pages/ProductCategory";
-import Materials from "./pages/Materials";
-import MaterialCategory from "./pages/MaterialCategory";
+import ProductsLandingPage from "./pages/ProductsLandingPage";
+import CategoryPage from "./pages/CategoryPage";
 import Process from "./pages/Process";
 import Company from "./pages/Company";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
@@ -19,12 +17,15 @@ import NotFound from "./pages/NotFound";
 export default function App() {
   return (
     <Routes>
-      <Route element={<SiteLayout />}>
+        <Route element={<SiteLayout />}>
         <Route index element={<Home />} />
-        <Route path="products" element={<Products />} />
-        <Route path="products/:categoryId" element={<ProductCategory />} />
-        <Route path="materials" element={<Materials />} />
-        <Route path="materials/:categoryId" element={<MaterialCategory />} />
+        <Route path="products" element={<ProductsLandingPage />} />
+        <Route path="products/:categorySlug" element={<CategoryPage />} />
+        <Route path="materials" element={<Navigate to="/products/materials-consumables" replace />} />
+        <Route
+          path="materials/:categoryId"
+          element={<Navigate to="/products/materials-consumables" replace />}
+        />
         <Route path="process" element={<Process />} />
         <Route path="layout-studio" element={<LayoutStudio />} />
         <Route path="layout" element={<LayoutStudio />} />
