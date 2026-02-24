@@ -938,41 +938,46 @@ export default function LayoutStudio() {
                     Room boundary + snap grid with zone-first planning and equipment placement
                   </p>
                 </div>
-                <div className="layout-stage-legend" aria-label="Canvas legend">
-                  <span className="zones"><i className="layout-stage-legend-dot zones" /> Zones</span>
-                  <span className="items"><i className="layout-stage-legend-dot items" /> Equipment</span>
-                </div>
-              </div>
+                <div className="layout-stage-header-tools">
+                  <div className="layout-stage-legend" aria-label="Canvas legend">
+                    <span className="zones"><i className="layout-stage-legend-dot zones" /> Zones</span>
+                    <span className="items"><i className="layout-stage-legend-dot items" /> Equipment</span>
+                  </div>
 
-              <div className="layout-stage-controls" aria-label="Canvas zoom controls">
-                <button
-                  type="button"
-                  className="layout-stage-control"
-                  onClick={() =>
-                    setZoom((previous) => clamp(Number((previous - 0.1).toFixed(2)), 0.5, 1.4))
-                  }
-                  aria-label="Zoom out"
-                >
-                  -
-                </button>
-                <span className="layout-stage-zoom-label">{Math.round(zoom * 100)}%</span>
-                <button
-                  type="button"
-                  className="layout-stage-control"
-                  onClick={() =>
-                    setZoom((previous) => clamp(Number((previous + 0.1).toFixed(2)), 0.5, 1.4))
-                  }
-                  aria-label="Zoom in"
-                >
-                  +
-                </button>
-                <button
-                  type="button"
-                  className="layout-stage-control layout-stage-control--fit"
-                  onClick={() => setZoom(1)}
-                >
-                  Fit
-                </button>
+                  <div className="layout-stage-controls-wrap">
+                    <span className="layout-stage-controls-label">View</span>
+                    <div className="layout-stage-controls" aria-label="Canvas zoom controls">
+                      <button
+                        type="button"
+                        className="layout-stage-control"
+                        onClick={() =>
+                          setZoom((previous) => clamp(Number((previous - 0.1).toFixed(2)), 0.5, 1.4))
+                        }
+                        aria-label="Zoom out"
+                      >
+                        -
+                      </button>
+                      <span className="layout-stage-zoom-label">{Math.round(zoom * 100)}%</span>
+                      <button
+                        type="button"
+                        className="layout-stage-control"
+                        onClick={() =>
+                          setZoom((previous) => clamp(Number((previous + 0.1).toFixed(2)), 0.5, 1.4))
+                        }
+                        aria-label="Zoom in"
+                      >
+                        +
+                      </button>
+                      <button
+                        type="button"
+                        className="layout-stage-control layout-stage-control--fit"
+                        onClick={() => setZoom(1)}
+                      >
+                        Fit
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
