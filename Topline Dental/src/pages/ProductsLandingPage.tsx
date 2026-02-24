@@ -1,7 +1,15 @@
 import { Link } from "react-router-dom";
 import { productCategories } from "../data/productCatalog";
+import { usePageSeo } from "../hooks/usePageSeo";
 
 export default function ProductsLandingPage() {
+  usePageSeo({
+    title: "Products & Solutions | Topline Dental Concept Malaysia",
+    description:
+      "Browse dental equipment and consumables categories from Topline Dental Concept Malaysia, including chairs, imaging, sterilization, water filtration, handpieces, and clinical supplies.",
+    path: "/products"
+  });
+
   return (
     <section className="section products-landing-page">
       <div className="section-heading products-landing-head">

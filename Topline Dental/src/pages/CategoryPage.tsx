@@ -6,6 +6,7 @@ import {
   productCategorySidebarLinks,
   type ProductCatalogSection
 } from "../data/productCatalog";
+import { usePageSeo } from "../hooks/usePageSeo";
 import NotFound from "./NotFound";
 
 type SortOption = "featured" | "az" | "price";
@@ -36,6 +37,13 @@ export default function CategoryPage() {
   }
 
   const families = getProductFamiliesForCategory(category.slug);
+  const seoDescription = `${category.intro} Browse subcategories, featured brands, selection guidance, and product families for quotation support.`;
+  usePageSeo({
+    title: `${category.title} | Topline Dental Concept Malaysia`,
+    description: seoDescription.slice(0, 160),
+    path: `/products/${category.slug}`
+  });
+
   const [search, setSearch] = useState("");
   const [brandFilter, setBrandFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
