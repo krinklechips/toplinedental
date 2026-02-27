@@ -55,10 +55,15 @@ export default function CategoryPage() {
   const selectionGuide = getSection(category.sections, "selection-guide");
   const ctaSection = getSection(category.sections, "cta");
 
+  const alphabeticalCompare = (left: string, right: string) =>
+    left.localeCompare(right, undefined, { sensitivity: "base" });
+
   const brandOptions = Array.from(
     new Set(families.map((family) => family.brand).filter((brand): brand is string => Boolean(brand)))
-  ).sort();
-  const typeOptions = Array.from(new Set(families.map((family) => family.subcategory))).sort();
+  ).sort(alphabeticalCompare);
+  const typeOptions = Array.from(new Set(families.map((family) => family.subcategory))).sort(
+    alphabeticalCompare
+  );
 
   const normalizedSearch = deferredSearch.trim().toLowerCase();
   const filteredFamilies = families

@@ -145,6 +145,24 @@ const getRoomRect = ({ width, height }: StageSize): RoomRect => {
   };
 };
 
+const getRingPerimeterOffsets = (ring: number) => {
+  const offsets: Array<{ dx: number; dy: number }> = [];
+
+  for (let dx = -ring; dx <= ring; dx += 1) {
+    offsets.push({ dx, dy: -ring });
+    if (ring !== 0) {
+      offsets.push({ dx, dy: ring });
+    }
+  }
+
+  for (let dy = -ring + 1; dy <= ring - 1; dy += 1) {
+    offsets.push({ dx: -ring, dy });
+    offsets.push({ dx: ring, dy });
+  }
+
+  return offsets;
+};
+
 type LayoutStudioState = {
   items: LayoutItem[];
   zones: LayoutZone[];
@@ -435,17 +453,11 @@ export default function LayoutStudio() {
 
       const maxRadius = 24;
       for (let ring = 1; ring <= maxRadius; ring += 1) {
-        for (let dx = -ring; dx <= ring; dx += 1) {
-          for (let dy = -ring; dy <= ring; dy += 1) {
-            if (Math.abs(dx) !== ring && Math.abs(dy) !== ring) {
-              continue;
-            }
-
-            const next = fitItemToRoom(candidate, x + dx * GRID_SIZE, y + dy * GRID_SIZE);
-            const nextCandidate = { ...candidate, ...next };
-            if (canPlaceItem(nextCandidate, candidate.id)) {
-              return next;
-            }
+        for (const { dx, dy } of getRingPerimeterOffsets(ring)) {
+          const next = fitItemToRoom(candidate, x + dx * GRID_SIZE, y + dy * GRID_SIZE);
+          const nextCandidate = { ...candidate, ...next };
+          if (canPlaceItem(nextCandidate, candidate.id)) {
+            return next;
           }
         }
       }
@@ -473,6 +485,30 @@ export default function LayoutStudio() {
     },
     [roomRect]
   );
+
+  const updateZonePositionById = useCallback((zoneId: string, x: number, y: number) => {
+    setZones((previous) =>
+      previous.map((entry) => (entry.id === zoneId ? { ...entry, x, y } : entry))
+    );
+  }, []);
+
+  const updateZoneSizeById = useCallback((zoneId: string, width: number, height: number) => {
+    setZones((previous) =>
+      previous.map((entry) => (entry.id === zoneId ? { ...entry, width, height } : entry))
+    );
+  }, []);
+
+  const updateItemPositionById = useCallback((itemId: string, x: number, y: number) => {
+    setItems((previous) =>
+      previous.map((entry) => (entry.id === itemId ? { ...entry, x, y } : entry))
+    );
+  }, []);
+
+  const updateItemById = useCallback((itemId: string, patch: Partial<LayoutItem>) => {
+    setItems((previous) =>
+      previous.map((entry) => (entry.id === itemId ? { ...entry, ...patch } : entry))
+    );
+  }, []);
 
   const addItem = useCallback(
     (type: LayoutItemType, x: number, y: number) => {
@@ -1077,11 +1113,7 @@ export default function LayoutStudio() {
                           height: zone.height
                         });
                         event.target.position({ x: nextRect.x, y: nextRect.y });
-                        setZones((previous) =>
-                          previous.map((entry) =>
-                            entry.id === zone.id ? { ...entry, x: nextRect.x, y: nextRect.y } : entry
-                          )
-                        );
+                        updateZonePositionById(zone.id, nextRect.x, nextRect.y);
                         setDraggingZoneId(null);
                         event.target.getStage()?.container().style.setProperty("cursor", "default");
                       }}
@@ -1154,13 +1186,7 @@ export default function LayoutStudio() {
                                 width: event.target.x() + 6,
                                 height: event.target.y() + 6
                               });
-                              setZones((previous) =>
-                                previous.map((entry) =>
-                                  entry.id === zone.id
-                                    ? { ...entry, width: nextRect.width, height: nextRect.height }
-                                    : entry
-                                )
-                              );
+                              updateZoneSizeById(zone.id, nextRect.width, nextRect.height);
                             }}
                             onDragEnd={(event) => {
                               event.cancelBubble = true;
@@ -1170,13 +1196,7 @@ export default function LayoutStudio() {
                                 width: event.target.x() + 6,
                                 height: event.target.y() + 6
                               });
-                              setZones((previous) =>
-                                previous.map((entry) =>
-                                  entry.id === zone.id
-                                    ? { ...entry, width: nextRect.width, height: nextRect.height }
-                                    : entry
-                                )
-                              );
+                              updateZoneSizeById(zone.id, nextRect.width, nextRect.height);
                               setDraggingZoneId(null);
                             }}
                           >
@@ -1306,11 +1326,7 @@ export default function LayoutStudio() {
                         const nextCandidate = { ...item, ...snappedPosition };
                         if (canPlaceItem(nextCandidate, item.id)) {
                           event.target.position(snappedPosition);
-                          setItems((previous) =>
-                            previous.map((entry) =>
-                              entry.id === item.id ? { ...entry, ...snappedPosition } : entry
-                            )
-                          );
+                          updateItemPositionById(item.id, snappedPosition.x, snappedPosition.y);
                         } else {
                           event.target.position({ x: item.x, y: item.y });
                         }
@@ -1407,11 +1423,7 @@ export default function LayoutStudio() {
                               return;
                             }
 
-                            setItems((previous) =>
-                              previous.map((entry) =>
-                                entry.id === item.id ? { ...entry, ...next } : entry
-                              )
-                            );
+                            updateItemById(item.id, next);
                             event.target.position({ x: next.width - 6, y: next.height - 6 });
                           }}
                           onDragEnd={(event) => {
