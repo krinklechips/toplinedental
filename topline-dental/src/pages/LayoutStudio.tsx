@@ -324,6 +324,54 @@ function CanvasGlyph({ type, stroke = "#1b5bd6" }: { type: LayoutItemType; strok
   }
 }
 
+function FloatingControl({
+  icon,
+  onClick,
+  y = 0,
+  variant = "default",
+  fontSize = 12
+}: {
+  icon: string;
+  onClick: () => void;
+  y?: number;
+  variant?: "default" | "danger";
+  fontSize?: number;
+}) {
+  const isDanger = variant === "danger";
+  const stopProp = (event: KonvaEventObject<MouseEvent | TouchEvent>) => {
+    event.cancelBubble = true;
+  };
+
+  return (
+    <Group
+      y={y}
+      onMouseDown={stopProp}
+      onTouchStart={stopProp}
+      onClick={(event) => {
+        stopProp(event);
+        onClick();
+      }}
+      onTap={(event) => {
+        stopProp(event);
+        onClick();
+      }}
+    >
+      <Circle
+        radius={11}
+        fill={isDanger ? "#fff4f4" : "#ffffff"}
+        stroke={isDanger ? "rgba(220, 38, 38, 0.34)" : "rgba(15, 23, 42, 0.18)"}
+      />
+      <Text
+        x={icon === "×" ? -3.5 : -4}
+        y={-6}
+        text={icon}
+        fontSize={fontSize}
+        fill={isDanger ? "#b42318" : "#0f172a"}
+      />
+    </Group>
+  );
+}
+
 export default function LayoutStudio() {
   const stageRef = useRef<Konva.Stage | null>(null);
   const canvasWrapRef = useRef<HTMLDivElement | null>(null);
@@ -1213,46 +1261,16 @@ export default function LayoutStudio() {
                           </Group>
 
                           <Group x={zone.width + 10} y={10}>
-                            <Group
-                              onMouseDown={(event) => {
-                                event.cancelBubble = true;
-                              }}
-                              onTouchStart={(event) => {
-                                event.cancelBubble = true;
-                              }}
-                              onClick={(event) => {
-                                event.cancelBubble = true;
-                                duplicateZone(zone.id);
-                              }}
-                              onTap={(event) => {
-                                event.cancelBubble = true;
-                                duplicateZone(zone.id);
-                              }}
-                            >
-                              <Circle radius={11} fill="#ffffff" stroke="rgba(15, 23, 42, 0.18)" />
-                              <Text x={-4} y={-6} text="+" fontSize={12} fill="#0f172a" />
-                            </Group>
-
-                            <Group
+                            <FloatingControl
+                              icon="+"
+                              onClick={() => duplicateZone(zone.id)}
+                            />
+                            <FloatingControl
                               y={28}
-                              onMouseDown={(event) => {
-                                event.cancelBubble = true;
-                              }}
-                              onTouchStart={(event) => {
-                                event.cancelBubble = true;
-                              }}
-                              onClick={(event) => {
-                                event.cancelBubble = true;
-                                removeZone(zone.id);
-                              }}
-                              onTap={(event) => {
-                                event.cancelBubble = true;
-                                removeZone(zone.id);
-                              }}
-                            >
-                              <Circle radius={11} fill="#fff4f4" stroke="rgba(220, 38, 38, 0.34)" />
-                              <Text x={-3.5} y={-6} text="×" fontSize={12} fill="#b42318" />
-                            </Group>
+                              icon="×"
+                              variant="danger"
+                              onClick={() => removeZone(zone.id)}
+                            />
                           </Group>
                         </>
                       )}
@@ -1446,67 +1464,22 @@ export default function LayoutStudio() {
 
                       {isSelected && (
                         <Group x={width + 10} y={10}>
-                          <Group
-                            onMouseDown={(event) => {
-                              event.cancelBubble = true;
-                            }}
-                            onTouchStart={(event) => {
-                              event.cancelBubble = true;
-                            }}
-                            onClick={(event) => {
-                              event.cancelBubble = true;
-                              rotateItem(item.id);
-                            }}
-                            onTap={(event) => {
-                              event.cancelBubble = true;
-                              rotateItem(item.id);
-                            }}
-                          >
-                            <Circle radius={11} fill="#ffffff" stroke="rgba(15, 23, 42, 0.18)" />
-                            <Text x={-4} y={-6} text="R" fontSize={10} fill="#0f172a" />
-                          </Group>
-
-                          <Group
+                          <FloatingControl
+                            icon="R"
+                            fontSize={10}
+                            onClick={() => rotateItem(item.id)}
+                          />
+                          <FloatingControl
                             y={28}
-                            onMouseDown={(event) => {
-                              event.cancelBubble = true;
-                            }}
-                            onTouchStart={(event) => {
-                              event.cancelBubble = true;
-                            }}
-                            onClick={(event) => {
-                              event.cancelBubble = true;
-                              duplicateItem(item.id);
-                            }}
-                            onTap={(event) => {
-                              event.cancelBubble = true;
-                              duplicateItem(item.id);
-                            }}
-                          >
-                            <Circle radius={11} fill="#ffffff" stroke="rgba(15, 23, 42, 0.18)" />
-                            <Text x={-4} y={-6} text="+" fontSize={12} fill="#0f172a" />
-                          </Group>
-
-                          <Group
+                            icon="+"
+                            onClick={() => duplicateItem(item.id)}
+                          />
+                          <FloatingControl
                             y={56}
-                            onMouseDown={(event) => {
-                              event.cancelBubble = true;
-                            }}
-                            onTouchStart={(event) => {
-                              event.cancelBubble = true;
-                            }}
-                            onClick={(event) => {
-                              event.cancelBubble = true;
-                              removeItem(item.id);
-                            }}
-                            onTap={(event) => {
-                              event.cancelBubble = true;
-                              removeItem(item.id);
-                            }}
-                          >
-                            <Circle radius={11} fill="#fff4f4" stroke="rgba(220, 38, 38, 0.34)" />
-                            <Text x={-3.5} y={-6} text="×" fontSize={12} fill="#b42318" />
-                          </Group>
+                            icon="×"
+                            variant="danger"
+                            onClick={() => removeItem(item.id)}
+                          />
                         </Group>
                       )}
                     </Group>

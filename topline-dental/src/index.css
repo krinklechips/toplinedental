@@ -1176,17 +1176,7 @@ kbd {
   align-content: start;
 }
 
-.layout-palette {
-  background: linear-gradient(180deg, #ffffff, #fbfdff);
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 20px;
-  box-shadow: var(--card-shadow);
-  padding: 18px;
-  display: grid;
-  align-content: start;
-  gap: 14px;
-}
-
+.layout-palette,
 .layout-zone-panel {
   background: linear-gradient(180deg, #ffffff, #fbfdff);
   border: 1px solid rgba(15, 23, 42, 0.08);
@@ -1194,8 +1184,8 @@ kbd {
   box-shadow: var(--card-shadow);
   padding: 18px;
   display: grid;
-  gap: 14px;
   align-content: start;
+  gap: 14px;
 }
 
 .layout-zone-grid {
