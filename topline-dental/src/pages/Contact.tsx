@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import {
   enquiryOptions,
@@ -9,23 +9,67 @@ import {
   equipmentFocusOptions
 } from "../data/siteContent";
 
+const INITIAL_FORM_STATE = {
+  enquiryType: "",
+  companyName: "",
+  role: "",
+  name: "",
+  email: "",
+  phone: "",
+  clinicSize: "",
+  location: "",
+  budget: "",
+  timeline: "",
+  preferredContact: "",
+  equipmentFocus: [] as string[],
+  message: "",
+  company_website: ""
+};
+
+type FormState = typeof INITIAL_FORM_STATE;
+
+const SelectField = ({
+  label,
+  name,
+  options,
+  value,
+  onChange,
+  required = false,
+  placeholder = "Select option"
+}: {
+  label: string;
+  name: keyof FormState;
+  options: readonly string[];
+  value: string;
+  onChange: (event: ChangeEvent<HTMLSelectElement>) => void;
+  required?: boolean;
+  placeholder?: string;
+}) => {
+  const id = useId();
+  return (
+    <div className="form-field">
+      <label htmlFor={id}>{label}</label>
+      <select
+        id={id}
+        name={name}
+        value={value}
+        onChange={onChange}
+        required={required}
+        className="form-input"
+      >
+        <option value="">{placeholder}</option>
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+};
+
 export default function Contact() {
-  const [form, setForm] = useState({
-    enquiryType: "",
-    companyName: "",
-    role: "",
-    name: "",
-    email: "",
-    phone: "",
-    clinicSize: "",
-    location: "",
-    budget: "",
-    timeline: "",
-    preferredContact: "",
-    equipmentFocus: [] as string[],
-    message: "",
-    company_website: ""
-  });
+  const [form, setForm] = useState(INITIAL_FORM_STATE);
   const [status, setStatus] = useState({ sending: false, ok: false });
 
   const handleChange = (
@@ -53,22 +97,7 @@ export default function Contact() {
     setStatus({ sending: true, ok: false });
     setTimeout(() => {
       setStatus({ sending: false, ok: true });
-      setForm({
-        enquiryType: "",
-        companyName: "",
-        role: "",
-        name: "",
-        email: "",
-        phone: "",
-        clinicSize: "",
-        location: "",
-        budget: "",
-        timeline: "",
-        preferredContact: "",
-        equipmentFocus: [],
-        message: "",
-        company_website: ""
-      });
+      setForm(INITIAL_FORM_STATE);
     }, 600);
   };
 
@@ -137,24 +166,15 @@ export default function Contact() {
               />
 
               <div className="contact-form-clean">
-                <div className="form-field">
-                  <label htmlFor="enquiryType">Enquiry Type</label>
-                  <select
-                    id="enquiryType"
-                    name="enquiryType"
-                    value={form.enquiryType}
-                    onChange={handleChange}
-                    required
-                    className="form-input"
-                  >
-                    <option value="">Select an option</option>
-                    {enquiryOptions.map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <SelectField
+                  label="Enquiry Type"
+                  name="enquiryType"
+                  value={form.enquiryType}
+                  onChange={handleChange}
+                  options={enquiryOptions}
+                  required
+                  placeholder="Select an option"
+                />
 
                 <div className="form-grid">
                   <div className="form-field">
@@ -240,77 +260,38 @@ export default function Contact() {
                 </div>
 
                 <div className="form-grid form-grid--quad">
-                  <div className="form-field">
-                    <label htmlFor="clinicSize">Clinic Size</label>
-                    <select
-                      id="clinicSize"
-                      name="clinicSize"
-                      value={form.clinicSize}
-                      onChange={handleChange}
-                      className="form-input"
-                    >
-                      <option value="">Select size</option>
-                      {clinicSizeOptions.map((option) => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="form-field">
-                    <label htmlFor="budget">Budget Range</label>
-                    <select
-                      id="budget"
-                      name="budget"
-                      value={form.budget}
-                      onChange={handleChange}
-                      className="form-input"
-                    >
-                      <option value="">Select budget</option>
-                      {budgetOptions.map((option) => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="form-field">
-                    <label htmlFor="timeline">Timeline</label>
-                    <select
-                      id="timeline"
-                      name="timeline"
-                      value={form.timeline}
-                      onChange={handleChange}
-                      className="form-input"
-                    >
-                      <option value="">Select timeline</option>
-                      {timelineOptions.map((option) => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="form-field">
-                    <label htmlFor="preferredContact">Preferred Contact</label>
-                    <select
-                      id="preferredContact"
-                      name="preferredContact"
-                      value={form.preferredContact}
-                      onChange={handleChange}
-                      className="form-input"
-                    >
-                      <option value="">Select method</option>
-                      {contactMethodOptions.map((option) => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <SelectField
+                    label="Clinic Size"
+                    name="clinicSize"
+                    value={form.clinicSize}
+                    onChange={handleChange}
+                    options={clinicSizeOptions}
+                    placeholder="Select size"
+                  />
+                  <SelectField
+                    label="Budget Range"
+                    name="budget"
+                    value={form.budget}
+                    onChange={handleChange}
+                    options={budgetOptions}
+                    placeholder="Select budget"
+                  />
+                  <SelectField
+                    label="Timeline"
+                    name="timeline"
+                    value={form.timeline}
+                    onChange={handleChange}
+                    options={timelineOptions}
+                    placeholder="Select timeline"
+                  />
+                  <SelectField
+                    label="Preferred Contact"
+                    name="preferredContact"
+                    value={form.preferredContact}
+                    onChange={handleChange}
+                    options={contactMethodOptions}
+                    placeholder="Select method"
+                  />
                 </div>
 
                 <div className="form-field">
