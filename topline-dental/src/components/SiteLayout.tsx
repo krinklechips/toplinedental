@@ -91,7 +91,7 @@ export default function SiteLayout() {
       return;
     }
 
-    const dismissed = window.sessionStorage.getItem("topline-newsletter-dismissed");
+    const dismissed = window.localStorage.getItem("topline-newsletter-dismissed");
     if (dismissed === "1") {
       return;
     }
@@ -116,7 +116,7 @@ export default function SiteLayout() {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setNewsletterOpen(false);
-        window.sessionStorage.setItem("topline-newsletter-dismissed", "1");
+        window.localStorage.setItem("topline-newsletter-dismissed", "1");
       }
     };
 
@@ -129,13 +129,13 @@ export default function SiteLayout() {
 
   const closeNewsletter = () => {
     setNewsletterOpen(false);
-    window.sessionStorage.setItem("topline-newsletter-dismissed", "1");
+    window.localStorage.setItem("topline-newsletter-dismissed", "1");
   };
 
   const handleNewsletterSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setNewsletterSubmitted(true);
-    window.sessionStorage.setItem("topline-newsletter-dismissed", "1");
+    window.localStorage.setItem("topline-newsletter-dismissed", "1");
   };
 
   return (
@@ -323,7 +323,7 @@ export default function SiteLayout() {
               <div className="mega-col">
                 <p className="mega-label">Euronda Line</p>
                 <Link to="/products/sterilization">E8 Autoclave</Link>
-                <Link to="/products/sterilization">Aquafilter 1 to 1</Link>
+                <Link to="/products/water-filtration">Aquafilter 1 to 1</Link>
                 <Link to="/products/sterilization">Thermodisinfectors</Link>
               </div>
               <div className="mega-col">

@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import ScrollToTop from "./components/ScrollToTop";
 import SiteLayout from "./components/SiteLayout";
 import Home from "./pages/Home";
 import ProductsLandingPage from "./pages/ProductsLandingPage";
@@ -16,7 +17,9 @@ import NotFound from "./pages/NotFound";
 
 export default function App() {
   return (
-    <Routes>
+    <>
+      <ScrollToTop />
+      <Routes>
         <Route element={<SiteLayout />}>
         <Route index element={<Home />} />
         <Route path="products" element={<ProductsLandingPage />} />
@@ -37,7 +40,8 @@ export default function App() {
         <Route path="sitemap" element={<SiteMapPage />} />
         <Route path="contact" element={<Contact />} />
         <Route path="*" element={<NotFound />} />
-      </Route>
-    </Routes>
+        </Route>
+      </Routes>
+    </>
   );
 }
